@@ -45,23 +45,9 @@ Application Web pour gérer un cinéma, avec deux types d’utilisateurs : **Adm
 
 ---
 
-## 4️ Base de Données (MySQL)
 
-### Table `films`
-- id, titre, description, image, durée
 
-### Table `seances`
-- id, film_id, date, heure, nb_places
-
-### Table `reservations`
-- id, seance_id, nom, email, nb_tickets
-
-### Table `admin`
-- id, username, password
-
----
-
-## 5️ Fonctionnement Logique
+## 4 Fonctionnement Logique
 
 1. L’utilisateur choisit un film
 2. Choisit une séance
