@@ -55,9 +55,4 @@ Application Web pour gérer un cinéma, avec deux types d’utilisateurs : **Adm
 4. Le système vérifie la disponibilité
 5. La réservation est enregistrée et le nombre de places disponible est mis à jour
 
----
-
-SELECT SUM(r.nb_tickets)
-FROM reservations r
-JOIN seances s ON r.seance_id = s.id
-WHERE s.film_id = 1;
+---RE s.film_id = 1;
