@@ -6,7 +6,6 @@
     <title>Document</title>
 </head>
 <body>
-    <h1>Ajouter un FILM</h1>
-    salut
+    <h1>Index</h1>
 </body>
 </html>
