@@ -6,7 +6,9 @@
     <title>Document</title>
 </head>
 <body>
-    <iframe src="dashboard.php" frameborder="0" width=30% ></iframe>
-    <iframe src="" frameborder="0" width=65%></iframe>
+    FILM
+    Ajouter un FILM
+    Seances
+    Reservation
 </body>
 </html>
