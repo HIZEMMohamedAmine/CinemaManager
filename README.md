@@ -55,4 +55,9 @@ Application Web pour gérer un cinéma, avec deux types d’utilisateurs : **Adm
 4. Le système vérifie la disponibilité
 5. La réservation est enregistrée et le nombre de places disponible est mis à jour
 
----RE s.film_id = 1;
+
+
+
+
+
+
