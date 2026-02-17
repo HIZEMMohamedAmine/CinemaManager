@@ -13,7 +13,7 @@ Application Web pour gérer un cinéma, avec deux types d’utilisateurs : **Adm
 
 ## 2️ Architecture Générale
 
-###  Utilisateur (User)
+##  Utilisateur ( Client )
 - Consulter les films disponibles
 - Voir les séances disponibles (date et heure)
 - Réserver des tickets
@@ -29,13 +29,13 @@ Application Web pour gérer un cinéma, avec deux types d’utilisateurs : **Adm
 
 ## 3️ Structure des Pages
 
-### Côté User
+## Côté User
 - `index.php` : Liste des films avec image, titre, description, bouton "Voir Séances"
 - `seances.php` : Liste des séances d’un film
 - `reservation.php` : Formulaire de réservation
 - `confirmation.php` : Confirmation de la réservation
 
-### Côté Admin
+## Côté Admin
 - `admin/login.php` : Connexion administrateur
 - `admin/dashboard.php` : Tableau de bord avec statistiques
 - `admin/films.php` : Liste des films avec actions Ajouter/Modifier/Supprimer
