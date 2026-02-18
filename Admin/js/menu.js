@@ -8,3 +8,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+logout = function() {
+    window.top.location.href = 'login.html';
+}
