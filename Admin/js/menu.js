@@ -9,6 +9,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-logout = function() {
+function logout() {
     window.top.location.href = 'login.html';
 }

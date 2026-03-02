@@ -4,7 +4,7 @@ document.getElementById('loginForm').addEventListener('submit', function(e) {
     var username = document.getElementById('username').value;
     var password = document.getElementById('password').value;
     
-    if(username && password) {
+    if(username=="admin" && password=="admin") {
         window.location.href = 'main.html';
     } else {
         document.getElementById('error').style.display = 'block';
