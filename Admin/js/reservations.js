@@ -1,11 +1,9 @@
-// Elements du DOM
-const tableBody = document.getElementById('films-tbody');
+const tableBody = document.getElementById('reservations-tbody');
 const searchInput = document.getElementById('filter-search');
-const btnAddFilm = document.getElementById('btn-add-film');
+const btnAddReservation = document.getElementById('btn-add-reservation');
 
-// Modale
-const modal = document.getElementById('film-modal');
-const form = document.getElementById('film-form');
+const modal = document.getElementById('reservation-modal');
+const form = document.getElementById('reservation-form');
 const btnCancel = document.getElementById('btn-cancel');
 
 function openModal() {
@@ -33,8 +31,8 @@ function filterTable() {
     });
 }
 
-if (btnAddFilm) {
-    btnAddFilm.addEventListener('click', openModal);
+if (btnAddReservation) {
+    btnAddReservation.addEventListener('click', openModal);
 }
 
 if (btnCancel) {
