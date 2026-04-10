@@ -12,23 +12,24 @@
 
 
         <div class="summary-grid">
-            <div class="card">
+            <div class="card" id="card-films">
                 <h2>Films</h2>
-                <p>Nombre total de films enregistrés</p>
+                <p>Total films enregistrés</p>
                 <strong>0</strong>
             </div>
-            <div class="card">
+            <div class="card" id="card-seances">
                 <h2>Séances</h2>
-                <p>Séances planifiées aujourd’hui</p>
+                <p>Planifiées aujourd'hui</p>
                 <strong>0</strong>
             </div>
-            <div class="card">
+            <div class="card" id="card-reservations">
                 <h2>Réservations</h2>
-                <p>Réservations confirmées cette semaine</p>
+                <p>Confirmées cette semaine</p>
                 <strong>0</strong>
             </div>
-            <div class="card">
+            <div class="card" id="card-places">
                 <h2>Places restantes</h2>
+                <p>Disponibles dans le cinéma</p>
                 <strong>0</strong>
             </div>
         </div>
@@ -45,9 +46,14 @@
                         <th>Tickets</th>
                     </tr>
                 </thead>
-            
+                <tbody>
+                    <tr><td colspan="5" class="empty">Chargement...</td></tr>
+                </tbody>
             </table>
         </div>
     </div>
+
+    <script src="../js/data.js"></script>
+    <script src="../js/suivi.js"></script>
 </body>
 </html>
