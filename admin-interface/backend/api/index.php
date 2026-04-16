@@ -8,7 +8,7 @@ $requestURI = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $method = $_SERVER['REQUEST_METHOD'];
 
 // Remove base path from URI
-$basePath = '/CinemaManager/api';
+$basePath = '/CinemaManager/admin-interface/backend/api';
 $route = str_replace($basePath, '', $requestURI);
 $route = trim($route, '/');
 
@@ -27,15 +27,15 @@ if ($resource === 'films') {
 }
 // Route seance requests
 elseif ($resource === 'seances') {
-    require_once __DIR__ . '/seance/seance.php';
+    require_once __DIR__ . '/seance/seances.php';
 }
 // Route reservation requests
 elseif ($resource === 'reservations') {
-    require_once __DIR__ . '/reservation/reservation.php';
+    require_once __DIR__ . '/reservation/reservations.php';
 }
 // Route salle requests
 elseif ($resource === 'salles') {
-    require_once __DIR__ . '/salle/salle.php';
+    require_once __DIR__ . '/salle/salles.php';
 }
 else {
     http_response_code(404);

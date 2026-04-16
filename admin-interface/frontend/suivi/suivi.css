@@ -69,3 +69,15 @@ body {
 .table tr:last-child td {
     border-bottom: none;
 }
+
+.table-empty {
+    text-align: center;
+    color: #657786;
+    padding: 20px;
+}
+
+.table-error {
+    text-align: center;
+    color: #c0392b;
+    padding: 20px;
+}

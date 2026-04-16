@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ajouter un film</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #fff;
+            padding: 30px 16px 60px;
+        }
+
+        .header {
+            max-width: 900px;
+            margin: 0 auto 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .header h1 {
+            color: #e94560;
+            font-size: 2.1rem;
+            text-shadow: 0 0 18px rgba(233, 69, 96, 0.35);
+        }
+
+        .header p {
+            color: #a0a0a0;
+            margin-top: 6px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            border: 0;
+            border-radius: 10px;
+            padding: 10px 14px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #fff;
+            background: rgba(255, 255, 255, 0.10);
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #e94560 0%, #ff6b6b 100%);
+        }
+
+        .card {
+            max-width: 900px;
+            margin: 0 auto;
+            background: linear-gradient(145deg, #1e1e2e, #252538);
+            border-radius: 18px;
+            padding: 26px;
+            border: 1px solid rgba(233, 69, 96, 0.28);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.45);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+        }
+
+        .form-group { display: flex; flex-direction: column; gap: 8px; }
+
+        .full { grid-column: 1 / -1; }
+
+        label {
+            color: #a0a0a0;
+            font-size: 0.92rem;
+            font-weight: 600;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 14px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.10);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: border-color 0.2s, background 0.2s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #e94560;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        select option { background: #1e1e2e; color: #fff; }
+
+        textarea { min-height: 90px; resize: vertical; }
+
+        .hint { color: #a0a0a0; font-size: 0.9rem; margin-top: 6px; }
+
+        .preview-wrap {
+            margin-top: 8px;
+        }
+
+        .cover-preview {
+            width: 160px;
+            height: 220px;
+            object-fit: cover;
+            border: 2px solid rgba(255, 255, 255, 0.16);
+            border-radius: 12px;
+            background: rgba(0, 0, 0, 0.2);
+            display: none;
+        }
+
+        .status {
+            margin-top: 14px;
+            color: #a0a0a0;
+            font-size: 0.95rem;
+            min-height: 1.2em;
+        }
+
+        @media (max-width: 680px) {
+            .form-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div>
+            <h1>CineManager</h1>
+            <p>Formulaire d'ajout d'un nouveau film</p>
+        </div>
+        <div class="actions">
+            <a class="btn" href="films.html" target="_self">Retour</a>
+        </div>
+    </div>
+
+    <div class="card">
+        <form id="filmForm" novalidate>
+            <div class="form-grid">
+                <div class="form-group full">
+                    <label for="title">Titre du film *</label>
+                    <input id="title" name="title" type="text" required placeholder="Ex: The Dark Knight">
+                </div>
+
+                <div class="form-group">
+                    <label for="genre">Genre *</label>
+                    <select id="genre" name="genre" required>
+                        <option value="">Sélectionner</option>
+                        <option value="Action">Action</option>
+                        <option value="Comedy">Comédie</option>
+                        <option value="Drama">Drame</option>
+                        <option value="Horror">Horreur</option>
+                        <option value="Sci-Fi">Science-fiction</option>
+                        <option value="Romance">Romance</option>
+                        <option value="Thriller">Thriller</option>
+                        <option value="Animation">Animation</option>
+                        <option value="Documentary">Documentaire</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="duration">Durée (minutes) *</label>
+                    <input id="duration" name="duration" type="number" min="1" required placeholder="120">
+                </div>
+
+                <div class="form-group">
+                    <label for="rating">Classification *</label>
+                    <select id="rating" name="rating" required>
+                        <option value="">Sélectionner</option>
+                        <option value="G">G - Tout public</option>
+                        <option value="PG">PG</option>
+                        <option value="PG-13">PG-13</option>
+                        <option value="R">R</option>
+                        <option value="NC-17">NC-17</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="poster">URL affiche (optionnel)</label>
+                    <input id="poster" name="poster" type="url" placeholder="https://.../poster.jpg">
+                </div>
+
+                <div class="form-group">
+                    <label for="posterFile">Photo de couverture (optionnel)</label>
+                    <input id="posterFile" type="file" accept="image/*">
+                    <div class="hint">Tu peux choisir un fichier image depuis ton appareil.</div>
+                </div>
+
+                <div class="form-group full preview-wrap">
+                    <img id="posterPreview" class="cover-preview" alt="Apercu affiche">
+                </div>
+
+                <div class="form-group full">
+                    <label for="synopsis">Synopsis (optionnel)</label>
+                    <textarea id="synopsis" name="synopsis" placeholder="Brève description..."></textarea>
+                </div>
+
+                <div class="form-group full">
+                    <button class="btn btn-primary" type="submit">Enregistrer le film</button>
+                    <div class="status" id="status"></div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        (function () {
+            'use strict';
+
+            const STORAGE_KEY = 'cinemaFilms';
+            const API_BASE = 'http://localhost:3000/api';
+            const query = new URLSearchParams(window.location.search);
+            const queryEditId = Number(query.get('edit'));
+            let editingFilmId = Number.isFinite(queryEditId) ? queryEditId : null;
+
+            const filmForm = document.getElementById('filmForm');
+            const statusEl = document.getElementById('status');
+            const submitBtn = filmForm.querySelector('button[type="submit"]');
+            const headerText = document.querySelector('.header p');
+            const posterInput = document.getElementById('poster');
+            const posterFileInput = document.getElementById('posterFile');
+            const posterPreview = document.getElementById('posterPreview');
+
+            function setStatus(message, isError) {
+                statusEl.textContent = message || '';
+                statusEl.style.color = isError ? '#ffb3b3' : '#a0a0a0';
+            }
+
+            function loadFilms() {
+                try {
+                    const raw = localStorage.getItem(STORAGE_KEY);
+                    const parsed = raw ? JSON.parse(raw) : [];
+                    return Array.isArray(parsed) ? parsed : [];
+                } catch {
+                    return [];
+                }
+            }
+
+            function saveFilms(films) {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(films));
+            }
+
+            async function loadFilmsFromApi() {
+                const response = await fetch(`${API_BASE}/films`, { cache: 'no-store' });
+                if (!response.ok) throw new Error('API unavailable');
+                const films = await response.json();
+                return Array.isArray(films) ? films : [];
+            }
+
+            async function loadFilmsUnified() {
+                try {
+                    const films = await loadFilmsFromApi();
+                    saveFilms(films);
+                    return films;
+                } catch {
+                    return loadFilms();
+                }
+            }
+
+            async function createFilmOnApi(payload) {
+                const response = await fetch(`${API_BASE}/films`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (!response.ok) throw new Error('Create failed');
+                return response.json();
+            }
+
+            async function updateFilmOnApi(filmId, payload) {
+                const response = await fetch(`${API_BASE}/films/${encodeURIComponent(filmId)}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (!response.ok) throw new Error('Update failed');
+                return response.json();
+            }
+
+            function getFilmById(films, filmId) {
+                return films.find((film) => Number(film.id) === Number(filmId)) || null;
+            }
+
+            function renderPosterPreview(source) {
+                const src = String(source || '').trim();
+                if (!src) {
+                    posterPreview.removeAttribute('src');
+                    posterPreview.style.display = 'none';
+                    return;
+                }
+
+                posterPreview.src = src;
+                posterPreview.style.display = 'block';
+                posterPreview.onerror = () => {
+                    posterPreview.removeAttribute('src');
+                    posterPreview.style.display = 'none';
+                };
+            }
+
+            async function applyEditModeIfNeeded() {
+                if (editingFilmId === null) return;
+
+                const films = await loadFilmsUnified();
+                const film = getFilmById(films, editingFilmId);
+
+                if (!film) {
+                    editingFilmId = null;
+                    setStatus('Film introuvable. Le mode ajout est activé.', true);
+                    return;
+                }
+
+                document.getElementById('title').value = film.title || '';
+                document.getElementById('genre').value = film.genre || '';
+                document.getElementById('duration').value = film.duration || '';
+                document.getElementById('rating').value = film.rating || '';
+                document.getElementById('poster').value = film.poster || '';
+                document.getElementById('synopsis').value = film.synopsis || '';
+                renderPosterPreview(film.poster || '');
+
+                if (submitBtn) submitBtn.textContent = 'Mettre à jour le film';
+                if (headerText) headerText.textContent = 'Modification d\'un film existant';
+                setStatus(`Mode modification: "${film.title || 'Film'}"`, false);
+            }
+
+            posterInput.addEventListener('input', () => {
+                renderPosterPreview(posterInput.value);
+            });
+
+            posterFileInput.addEventListener('change', () => {
+                const file = posterFileInput.files && posterFileInput.files[0];
+                if (!file) return;
+
+                if (!String(file.type || '').startsWith('image/')) {
+                    setStatus('Le fichier selectionne doit etre une image.', true);
+                    posterFileInput.value = '';
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = () => {
+                    const dataUrl = String(reader.result || '').trim();
+                    if (!dataUrl) {
+                        setStatus('Impossible de lire la photo.', true);
+                        return;
+                    }
+
+                    posterInput.value = dataUrl;
+                    renderPosterPreview(dataUrl);
+                    setStatus(`Photo chargee: ${file.name}`, false);
+                };
+
+                reader.onerror = () => {
+                    setStatus('Erreur lors du chargement de la photo.', true);
+                };
+
+                reader.readAsDataURL(file);
+            });
+
+            filmForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                setStatus('', false);
+
+                const formData = new FormData(filmForm);
+                const title = String(formData.get('title') || '').trim();
+                const genre = String(formData.get('genre') || '').trim();
+                const durationValue = Number(formData.get('duration'));
+                const rating = String(formData.get('rating') || '').trim();
+                const poster = String(formData.get('poster') || '').trim();
+                const synopsis = String(formData.get('synopsis') || '').trim();
+
+                if (!title || !genre || !rating || !Number.isFinite(durationValue) || durationValue <= 0) {
+                    setStatus('Merci de remplir tous les champs obligatoires (*).', true);
+                    return;
+                }
+
+                const payload = {
+                    title,
+                    genre,
+                    duration: Math.round(durationValue),
+                    rating,
+                    poster: poster || '',
+                    synopsis
+                };
+
+                const films = await loadFilmsUnified();
+
+                if (editingFilmId !== null) {
+                    const index = films.findIndex((film) => Number(film.id) === Number(editingFilmId));
+                    if (index === -1) {
+                        setStatus('Impossible de modifier: film introuvable.', true);
+                        return;
+                    }
+
+                    try {
+                        const updated = await updateFilmOnApi(editingFilmId, payload);
+                        films[index] = updated;
+                        saveFilms(films);
+                    } catch {
+                        films[index] = {
+                            ...films[index],
+                            ...payload,
+                            updatedAt: new Date().toISOString()
+                        };
+                        saveFilms(films);
+                    }
+
+                    window.location.href = 'films.html';
+                    return;
+                }
+
+                const film = {
+                    id: Date.now(),
+                    ...payload,
+                    addedAt: new Date().toISOString()
+                };
+
+                try {
+                    const created = await createFilmOnApi(payload);
+                    films.push(created);
+                } catch {
+                    films.push(film);
+                }
+
+                saveFilms(films);
+
+                filmForm.reset();
+                renderPosterPreview('');
+
+                setStatus(`Film ajouté: "${film.title}"`, false);
+            });
+
+            applyEditModeIfNeeded();
+        })();
+    </script>
+</body>
+</html>

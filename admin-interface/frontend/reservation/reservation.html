@@ -79,12 +79,13 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label for="date-input">Date</label>
-                        <input type="date" id="date-input" required>
+                        <input type="date" id="date-input" readonly>
                     </div>
                     <div class="form-group">
-                        <label for="heure-input">Seance ID  </label>
-                        <!-- drop down list of seances d apres la bd dans le future  type select-->
-                        <input type="text" id="heure-input" required>
+                        <label for="heure-input">Seance ID</label>
+                        <select id="heure-input" required>
+                            <option value="">Choisir un film d'abord</option>
+                        </select>
                     </div>
                 </div>
 
@@ -95,7 +96,7 @@
                     </div>
                     <div class="form-group">
                         <label for="total-input">Total (TND)</label>
-                        <input type="number" step="0.5" id="total-input" min="0" required>
+                        <input type="number" step="0.01" id="total-input" min="0" value="0" readonly>
                     </div>
                 </div>
 
