@@ -2,6 +2,59 @@
 
 Application Web pour gérer un cinéma, avec deux types d’utilisateurs : **Admin** et **User**.
 
+## Nouvelle Separation Frontend / Backend
+
+- Frontend: pages d'administration dans le dossier `Admin/`
+- Backend: API REST dans `backend/server.js`
+- Donnees backend: `backend/data/films.json`
+- Donnees reservations: `backend/data/reservations.json`
+- Base login admin: `backend/data/cinema.sqlite`
+
+### Lancer l'application
+
+1. Installer Node.js (si pas deja installe)
+2. Depuis la racine du projet, lancer:
+
+```bash
+npm.cmd start
+```
+
+3. Ouvrir ensuite:
+
+```text
+http://localhost:3000/Admin/html/main.html
+```
+
+### API disponible
+
+- `GET /api/health`
+- `POST /api/auth/login`
+- `GET /api/films`
+- `POST /api/films`
+- `GET /api/films/:id`
+- `PUT /api/films/:id`
+- `DELETE /api/films/:id`
+- `GET /api/reservations`
+- `POST /api/reservations`
+- `GET /api/reservations/:id`
+- `DELETE /api/reservations/:id`
+
+Note:
+- Les horaires (seances) se gerent uniquement dans la page `Seances`.
+- La page `Ajouter Film` ne contient plus la saisie des horaires.
+
+Champs reservations:
+- `ticketSeats`: numero de place de chaque ticket (de 1 a 120)
+- `tickets`: numeros de ticket generes automatiquement par le backend
+- `reservedAtClient`: date/heure de reservation selon l'horloge du PC client
+- Si toutes les places sont vendues pour une seance, elle est marquee `Complet`
+
+### Connexion Admin
+
+- Compte par defaut cree au premier demarrage:
+	- Username: `admin`
+	- Password: `admin`
+
 ---
 
 ## 1️ Présentation du Projet

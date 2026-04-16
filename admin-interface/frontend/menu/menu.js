@@ -10,5 +10,5 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function logout() {
-    window.top.location.href = 'login.html';
+    window.top.location.href = '../../../user-interface/frontend/login/login.html';
 }

@@ -1,0 +1,11 @@
+{
+  "name": "cinemamanager",
+  "version": "1.0.0",
+  "private": true,
+  "description": "CinemaManager split into frontend and backend",
+  "scripts": {
+    "start": "node backend/server.js",
+    "start:backend": "node backend/server.js"
+
+  }
+}

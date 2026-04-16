@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seances</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #fff;
+            padding: 24px 18px 60px;
+        }
+
+        .header {
+            max-width: 1200px;
+            margin: 0 auto 18px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            color: #e94560;
+            text-shadow: 0 0 18px rgba(233, 69, 96, 0.35);
+        }
+
+        .header p {
+            color: #a0a0a0;
+            margin-top: 6px;
+        }
+
+        .refresh-btn {
+            border: 0;
+            border-radius: 10px;
+            padding: 10px 14px;
+            cursor: pointer;
+            font-weight: 700;
+            color: #fff;
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .seances-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 18px;
+        }
+
+        .film-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.10);
+            border-radius: 14px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .film-title {
+            font-size: 1.1rem;
+            font-weight: 800;
+            line-height: 1.3;
+        }
+
+        .film-meta {
+            color: #a0a0a0;
+            font-size: 0.9rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .showtimes {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            min-height: 34px;
+        }
+
+        .tag {
+            background: rgba(233, 69, 96, 0.18);
+            border: 1px solid #e94560;
+            color: #e94560;
+            border-radius: 999px;
+            padding: 5px 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.86rem;
+            font-weight: 700;
+        }
+
+        .tag button {
+            border: 0;
+            background: none;
+            color: inherit;
+            cursor: pointer;
+            font-size: 1rem;
+            line-height: 1;
+        }
+
+        .muted {
+            color: #a0a0a0;
+            font-size: 0.9rem;
+        }
+
+        .add-row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .add-row input[type="time"] {
+            min-width: 140px;
+            padding: 9px 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            background: rgba(255, 255, 255, 0.08);
+            color: #fff;
+        }
+
+        .btn {
+            border: 0;
+            border-radius: 8px;
+            padding: 9px 11px;
+            font-weight: 700;
+            color: #fff;
+            cursor: pointer;
+            font-size: 0.84rem;
+        }
+
+        .btn-add { background: rgba(79, 70, 229, 0.9); }
+        .btn-save { background: rgba(34, 197, 94, 0.9); }
+        .btn-reset { background: rgba(255, 255, 255, 0.16); }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .status {
+            min-height: 1.2em;
+            font-size: 0.9rem;
+            color: #a0a0a0;
+        }
+
+        .empty {
+            grid-column: 1 / -1;
+            padding: 50px 16px;
+            text-align: center;
+            border: 1px dashed rgba(255, 255, 255, 0.25);
+            border-radius: 14px;
+            color: #a0a0a0;
+            background: rgba(0, 0, 0, 0.15);
+        }
+
+        @media (max-width: 560px) {
+            .add-row input[type="time"] {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div>
+            <h1>Gestion des seances</h1>
+            <p>Ajoute, retire et enregistre les horaires pour chaque film.</p>
+        </div>
+        <button type="button" id="refreshBtn" class="refresh-btn">Rafraichir</button>
+    </div>
+
+    <div class="seances-grid" id="seancesContainer"></div>
+
+    <script>
+        (function () {
+            'use strict';
+
+            const STORAGE_KEY = 'cinemaFilms';
+            const API_BASE = 'http://localhost:3000/api';
+
+            let filmsState = [];
+
+            function normalizeTime(time) {
+                const raw = String(time || '').trim();
+                return /^([0-1]\d|2[0-3]):[0-5]\d$/.test(raw) ? raw : '';
+            }
+
+            function uniqSortedTimes(times) {
+                return Array.from(
+                    new Set((Array.isArray(times) ? times : []).map(normalizeTime).filter(Boolean))
+                ).sort();
+            }
+
+            function loadFilmsFromLocalStorage() {
+                try {
+                    const raw = localStorage.getItem(STORAGE_KEY);
+                    const parsed = raw ? JSON.parse(raw) : [];
+                    return Array.isArray(parsed) ? parsed : [];
+                } catch {
+                    return [];
+                }
+            }
+
+            function saveFilmsToLocalStorage(films) {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(films));
+            }
+
+            async function loadFilmsFromApi() {
+                const response = await fetch(`${API_BASE}/films`, { cache: 'no-store' });
+                if (!response.ok) throw new Error('API unavailable');
+                const films = await response.json();
+                return Array.isArray(films) ? films : [];
+            }
+
+            async function loadFilmsUnified() {
+                try {
+                    const films = await loadFilmsFromApi();
+                    saveFilmsToLocalStorage(films);
+                    return films;
+                } catch {
+                    return loadFilmsFromLocalStorage();
+                }
+            }
+
+            async function updateFilmOnApi(filmId, payload) {
+                const response = await fetch(`${API_BASE}/films/${encodeURIComponent(filmId)}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (!response.ok) throw new Error('Update failed');
+                return response.json();
+            }
+
+            function createEmptyState() {
+                const empty = document.createElement('div');
+                empty.className = 'empty';
+
+                const title = document.createElement('h2');
+                title.textContent = 'Aucun film disponible';
+
+                const text = document.createElement('p');
+                text.style.marginTop = '8px';
+                text.textContent = 'Ajoute un film dans "Ajouter Film" pour gerer ses seances.';
+
+                empty.appendChild(title);
+                empty.appendChild(text);
+                return empty;
+            }
+
+            function setLocalStateFilm(updatedFilm) {
+                const index = filmsState.findIndex((film) => Number(film.id) === Number(updatedFilm.id));
+                if (index === -1) return;
+                filmsState[index] = updatedFilm;
+                saveFilmsToLocalStorage(filmsState);
+            }
+
+            function createFilmCard(film) {
+                const card = document.createElement('article');
+                card.className = 'film-card';
+
+                const title = document.createElement('h2');
+                title.className = 'film-title';
+                title.textContent = film.title || 'Sans titre';
+
+                const meta = document.createElement('div');
+                meta.className = 'film-meta';
+                meta.innerHTML = `<span>${film.genre || 'Genre'}</span><span>${film.duration || '?'} min</span><span>${film.rating || '?'}</span>`;
+
+                const showtimesLabel = document.createElement('div');
+                showtimesLabel.className = 'muted';
+                showtimesLabel.textContent = 'Horaires actuels';
+
+                const showtimesEl = document.createElement('div');
+                showtimesEl.className = 'showtimes';
+
+                const addRow = document.createElement('div');
+                addRow.className = 'add-row';
+
+                const timeInput = document.createElement('input');
+                timeInput.type = 'time';
+                timeInput.setAttribute('aria-label', `Nouvel horaire pour ${film.title || 'ce film'}`);
+
+                const addBtn = document.createElement('button');
+                addBtn.type = 'button';
+                addBtn.className = 'btn btn-add';
+                addBtn.textContent = '+ Ajouter';
+
+                addRow.appendChild(timeInput);
+                addRow.appendChild(addBtn);
+
+                const actions = document.createElement('div');
+                actions.className = 'actions';
+
+                const saveBtn = document.createElement('button');
+                saveBtn.type = 'button';
+                saveBtn.className = 'btn btn-save';
+                saveBtn.textContent = 'Enregistrer';
+
+                const resetBtn = document.createElement('button');
+                resetBtn.type = 'button';
+                resetBtn.className = 'btn btn-reset';
+                resetBtn.textContent = 'Annuler';
+
+                actions.appendChild(saveBtn);
+                actions.appendChild(resetBtn);
+
+                const status = document.createElement('div');
+                status.className = 'status';
+
+                let savedShowtimes = uniqSortedTimes(film.showtimes);
+                let draftShowtimes = savedShowtimes.slice();
+
+                function setStatus(message, isError) {
+                    status.textContent = message || '';
+                    status.style.color = isError ? '#ffb3b3' : '#a0a0a0';
+                }
+
+                function renderShowtimes() {
+                    showtimesEl.innerHTML = '';
+
+                    if (draftShowtimes.length === 0) {
+                        const empty = document.createElement('span');
+                        empty.className = 'muted';
+                        empty.textContent = 'Aucune seance';
+                        showtimesEl.appendChild(empty);
+                        return;
+                    }
+
+                    draftShowtimes.forEach((time) => {
+                        const tag = document.createElement('span');
+                        tag.className = 'tag';
+                        tag.textContent = time;
+
+                        const removeBtn = document.createElement('button');
+                        removeBtn.type = 'button';
+                        removeBtn.textContent = 'x';
+                        removeBtn.setAttribute('aria-label', `Supprimer ${time}`);
+                        removeBtn.addEventListener('click', () => {
+                            draftShowtimes = draftShowtimes.filter((value) => value !== time);
+                            renderShowtimes();
+                            setStatus('', false);
+                        });
+
+                        tag.appendChild(removeBtn);
+                        showtimesEl.appendChild(tag);
+                    });
+                }
+
+                function addShowtime() {
+                    const time = normalizeTime(timeInput.value);
+
+                    if (!time) {
+                        setStatus('Horaire invalide. Utilise HH:MM.', true);
+                        return;
+                    }
+
+                    if (draftShowtimes.includes(time)) {
+                        setStatus('Cet horaire existe deja.', true);
+                        return;
+                    }
+
+                    draftShowtimes.push(time);
+                    draftShowtimes = draftShowtimes.slice().sort();
+                    timeInput.value = '';
+                    renderShowtimes();
+                    setStatus('', false);
+                }
+
+                async function saveShowtimes() {
+                    const payload = {
+                        title: String(film.title || '').trim(),
+                        genre: String(film.genre || '').trim(),
+                        duration: Number(film.duration),
+                        rating: String(film.rating || '').trim(),
+                        poster: String(film.poster || '').trim(),
+                        synopsis: String(film.synopsis || '').trim(),
+                        showtimes: draftShowtimes.slice().sort()
+                    };
+
+                    if (!payload.title || !payload.genre || !payload.rating || !Number.isFinite(payload.duration) || payload.duration <= 0) {
+                        setStatus('Film invalide: complete les infos dans Ajouter Film.', true);
+                        return;
+                    }
+
+                    saveBtn.disabled = true;
+                    saveBtn.style.opacity = '0.65';
+
+                    try {
+                        const updated = await updateFilmOnApi(film.id, payload);
+                        savedShowtimes = uniqSortedTimes(updated.showtimes);
+                        draftShowtimes = savedShowtimes.slice();
+                        film = { ...film, ...updated };
+                        setLocalStateFilm(film);
+                        renderShowtimes();
+                        setStatus('Seances enregistrees.', false);
+                    } catch {
+                        film = {
+                            ...film,
+                            ...payload,
+                            updatedAt: new Date().toISOString()
+                        };
+                        savedShowtimes = uniqSortedTimes(film.showtimes);
+                        draftShowtimes = savedShowtimes.slice();
+                        setLocalStateFilm(film);
+                        renderShowtimes();
+                        setStatus('API indisponible: sauvegarde locale effectuee.', false);
+                    } finally {
+                        saveBtn.disabled = false;
+                        saveBtn.style.opacity = '1';
+                    }
+                }
+
+                addBtn.addEventListener('click', addShowtime);
+
+                timeInput.addEventListener('keydown', (event) => {
+                    if (event.key === 'Enter') {
+                        event.preventDefault();
+                        addShowtime();
+                    }
+                });
+
+                saveBtn.addEventListener('click', saveShowtimes);
+
+                resetBtn.addEventListener('click', () => {
+                    draftShowtimes = savedShowtimes.slice();
+                    renderShowtimes();
+                    setStatus('Modifications annulees.', false);
+                });
+
+                renderShowtimes();
+
+                card.appendChild(title);
+                card.appendChild(meta);
+                card.appendChild(showtimesLabel);
+                card.appendChild(showtimesEl);
+                card.appendChild(addRow);
+                card.appendChild(actions);
+                card.appendChild(status);
+
+                return card;
+            }
+
+            async function renderPage() {
+                const container = document.getElementById('seancesContainer');
+                if (!container) return;
+
+                filmsState = await loadFilmsUnified();
+                container.innerHTML = '';
+
+                if (filmsState.length === 0) {
+                    container.appendChild(createEmptyState());
+                    return;
+                }
+
+                filmsState
+                    .slice()
+                    .sort((a, b) => String(a.title || '').localeCompare(String(b.title || '')))
+                    .forEach((film) => {
+                        container.appendChild(createFilmCard(film));
+                    });
+            }
+
+            document.getElementById('refreshBtn').addEventListener('click', () => {
+                renderPage();
+            });
+
+            window.addEventListener('DOMContentLoaded', () => {
+                renderPage();
+            });
+        })();
+    </script>
+</body>
+</html>
