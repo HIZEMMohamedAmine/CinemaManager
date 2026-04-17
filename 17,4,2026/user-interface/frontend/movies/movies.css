@@ -1,0 +1,224 @@
+/* ============================================
+   MOVIES PAGE STYLES — CINEMAX PREMIUM
+   ============================================ */
+
+.movies-page {
+  background: var(--primary-dark);
+}
+
+/* ============================================
+   PAGE HEADER
+   ============================================ */
+
+.page-header {
+  background: linear-gradient(135deg, rgba(0, 217, 255, 0.06), rgba(168, 85, 247, 0.06));
+  border-bottom: 1px solid var(--border-color);
+  padding: 3rem 2rem;
+  margin-bottom: 2rem;
+  border-radius: var(--radius-lg);
+  position: relative;
+  overflow: hidden;
+}
+
+.page-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--gradient-premium);
+}
+
+.page-header h1 {
+  margin-bottom: 0.5rem;
+  background: var(--gradient-premium);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-family: 'Outfit', sans-serif;
+}
+
+.page-header p {
+  font-size: 1.1rem;
+  color: var(--accent-cyan);
+  font-weight: 500;
+}
+
+/* ============================================
+   FILTERS SECTION
+   ============================================ */
+
+.filters-section {
+  background: var(--gradient-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1.8rem;
+  margin-bottom: 2rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  align-items: flex-end;
+  backdrop-filter: blur(20px);
+  box-shadow: var(--shadow-md);
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.filter-group label {
+  font-weight: 700;
+  margin-bottom: 0.6rem;
+  color: var(--text-primary);
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-family: 'Inter', sans-serif;
+}
+
+.filter-select {
+  padding: 0.85rem 1rem;
+  background: rgba(6, 10, 26, 0.6);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all var(--transition-smooth);
+  font-size: 0.92rem;
+  font-weight: 500;
+  font-family: 'Inter', sans-serif;
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: var(--accent-blue);
+  background: rgba(0, 217, 255, 0.05);
+  box-shadow: 0 0 0 3px rgba(0, 217, 255, 0.1);
+}
+
+.filter-select option {
+  background: var(--secondary-dark);
+  color: var(--text-primary);
+}
+
+#resetFilters {
+  align-self: flex-end;
+}
+
+/* ============================================
+   RESULTS INFO
+   ============================================ */
+
+.results-info {
+  margin-bottom: 1.5rem;
+  padding: 1rem 1.5rem;
+  background: rgba(0, 217, 255, 0.04);
+  border-left: 3px solid var(--accent-blue);
+  border-radius: var(--radius-sm);
+  backdrop-filter: blur(10px);
+}
+
+#resultCount {
+  margin: 0;
+  color: var(--accent-cyan);
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+
+/* ============================================
+   MOVIES GRID
+   ============================================ */
+
+.movies-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+/* ============================================
+   NO RESULTS
+   ============================================ */
+
+.no-results {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: var(--gradient-card);
+  border: 2px dashed rgba(0, 217, 255, 0.15);
+  border-radius: var(--radius-lg);
+  margin-bottom: 2rem;
+  backdrop-filter: blur(10px);
+}
+
+.no-results-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  opacity: 0.4;
+}
+
+.no-results h2 {
+  margin-bottom: 0.5rem;
+}
+
+.no-results p {
+  margin-bottom: 1.5rem;
+}
+
+/* ============================================
+   RESPONSIVE MOVIES PAGE
+   ============================================ */
+
+@media (max-width: 1024px) {
+  .movies-grid {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  }
+  .filters-section {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .page-header {
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  .filters-section {
+    grid-template-columns: 1fr;
+    padding: 1.2rem;
+    gap: 1rem;
+  }
+  #resetFilters {
+    align-self: stretch;
+  }
+  .movies-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-header {
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+  .page-header h1 {
+    font-size: 1.5rem;
+  }
+  .filters-section {
+    padding: 0.75rem;
+    gap: 0.75rem;
+  }
+  .filter-group label {
+    font-size: 0.75rem;
+  }
+  .filter-select {
+    padding: 0.6rem;
+    font-size: 0.85rem;
+  }
+  .movies-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 1rem;
+  }
+}

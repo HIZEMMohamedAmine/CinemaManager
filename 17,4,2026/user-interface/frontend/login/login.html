@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Connexion — CineMax</title>
+  <meta name="description" content="Connectez-vous à votre compte CineMax pour réserver vos places de cinéma">
+  <link rel="stylesheet" href="../css/global.css" />
+  <link rel="stylesheet" href="login.css" />
+</head>
+<body>
+
+  <!-- Animated Background -->
+  <div class="auth-bg">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <div class="grid-overlay"></div>
+  </div>
+
+  <!-- Login Card -->
+  <div class="auth-card" id="authCard">
+    <a href="../index/index.html" class="back-link">← Retour à l'accueil</a>
+
+    <div class="logo-section">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/>
+          <line x1="7" y1="2" x2="7" y2="22"/>
+          <line x1="17" y1="2" x2="17" y2="22"/>
+          <line x1="2" y1="12" x2="22" y2="12"/>
+          <line x1="2" y1="7" x2="7" y2="7"/>
+          <line x1="2" y1="17" x2="7" y2="17"/>
+          <line x1="17" y1="7" x2="22" y2="7"/>
+          <line x1="17" y1="17" x2="22" y2="17"/>
+        </svg>
+      </div>
+      <h1 id="card-title">Bienvenue</h1>
+      <p class="auth-subtitle" id="card-sub">Connectez-vous à votre espace CineMax</p>
+    </div>
+
+    <!-- Form -->
+    <form id="login-form" onsubmit="handleSubmit(event)">
+
+      <div class="auth-form-group">
+        <label for="username">Nom d'utilisateur</label>
+        <div class="input-wrap">
+          <input type="text" id="username" placeholder="Votre pseudo..." required autocomplete="username" />
+          <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+            <circle cx="12" cy="7" r="4" />
+          </svg>
+        </div>
+      </div>
+
+      <div class="auth-form-group">
+        <label for="password">Mot de passe</label>
+        <div class="input-wrap">
+          <input type="password" id="password" placeholder="••••••••" required autocomplete="current-password" />
+          <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2" />
+            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+          </svg>
+          <button type="button" class="eye-btn" id="eye-btn" onclick="togglePwd()" title="Afficher/masquer">
+            <svg id="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+              <circle cx="12" cy="12" r="3" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-submit" id="submit-btn">
+        <span class="btn-text">Se connecter</span>
+        <span class="btn-loader" style="display: none;">
+          <span class="spinner"></span>
+        </span>
+      </button>
+    </form>
+
+    <div class="auth-divider"><span>ou</span></div>
+
+    <div class="auth-footer">
+      Pas encore de compte ? <a href="../signup/signup.html">Créer un compte</a>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="login.js"></script>
+</body>
+</html>

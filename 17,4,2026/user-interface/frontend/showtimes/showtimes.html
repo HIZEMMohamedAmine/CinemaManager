@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Showtimes — CineMax</title>
+  <meta name="description" content="Check today's showtimes and book your cinema tickets at CineMax.">
+  <link rel="stylesheet" href="../css/global.css">
+  <link rel="stylesheet" href="showtimes.css">
+  <link rel="stylesheet" href="../components/navbar/navbar.css">
+  <link rel="stylesheet" href="../components/footer/footer.css">
+</head>
+<body>
+  <div class="top-bar">
+    <div class="top-bar-container">
+      <a href="../index/index.html" class="logo">CINEMAX</a>
+      <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Search movies, showtimes..." class="search-input">
+        <button class="search-btn">Search</button>
+      </div>
+      <div class="shortcuts">
+        <a href="../index/index.html" class="shortcut-btn">Home</a>
+        <a href="../movies/movies.html" class="shortcut-btn">Browse</a>
+        <a href="../showtimes/showtimes.html" class="shortcut-btn">Showtimes</a>
+      </div>
+    </div>
+  </div>
+
+  <nav class="navbar">
+    <div class="navbar-container">
+      <ul class="nav-links">
+        <li><a href="../index/index.html" class="nav-link">Home</a></li>
+        <li><a href="../movies/movies.html" class="nav-link">Movies</a></li>
+        <li><a href="../showtimes/showtimes.html" class="nav-link active">Showtimes</a></li>
+      </ul>
+      <div class="auth-buttons"><a href="../login/login.html" class="btn btn-login">🔐 Login</a></div>
+      <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
+    </div>
+  </nav>
+
+  <main class="showtimes-page">
+    <div class="page-header reveal">
+      <div class="container">
+        <h1>Today's Showtimes</h1>
+        <p>Check available sessions and book your tickets</p>
+      </div>
+    </div>
+
+    <div class="container">
+      <section class="date-selector-section reveal">
+        <h2>Select a Date</h2>
+        <div class="date-buttons" id="dateButtons"></div>
+      </section>
+
+      <section class="showtimes-section">
+        <div id="showTimesContainer"></div>
+        <div id="noShowtimes" class="no-results" style="display: none;">
+          <div class="no-results-icon">🎬</div>
+          <h2>No Showtimes Available</h2>
+          <p>There are no showtimes available for the selected date</p>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-grid">
+        <div class="footer-section"><h3>CineMax</h3><p>Experience cinema like never before.</p><div class="social-links"><a href="#" class="social-link">Facebook</a><a href="#" class="social-link">X</a><a href="#" class="social-link">Instagram</a><a href="#" class="social-link">YouTube</a></div></div>
+        <div class="footer-section"><h3>Quick Links</h3><ul><li><a href="../index/index.html">Home</a></li><li><a href="../movies/movies.html">Movies</a></li><li><a href="../showtimes/showtimes.html">Showtimes</a></li><li><a href="#contact">Contact</a></li></ul></div>
+        <div class="footer-section"><h3>Support</h3><ul><li><a href="#">FAQ</a></li><li><a href="#">Help Center</a></li><li><a href="#">Booking Terms</a></li><li><a href="#">Refund Policy</a></li></ul></div>
+        <div class="footer-section"><h3>Contact</h3><p><strong>Location:</strong> 123 Cinema Street, Tunis</p><p><strong>Phone:</strong> +216 XX XXX XXXX</p><p><strong>Email:</strong> info@cinemax.tn</p><p><strong>Hours:</strong> 9 AM - 12 AM</p></div>
+      </div>
+      <div class="footer-bottom"><p>&copy; 2026 CineMax. All rights reserved.</p><ul class="footer-links"><li><a href="#">Privacy Policy</a></li><li><a href="#">Terms of Service</a></li><li><a href="#">Cookie Settings</a></li></ul></div>
+    </div>
+  </footer>
+
+  <script src="../data/movies.js"></script>
+  <script src="../data/animations.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const hamburger = document.getElementById('hamburger');
+      const navLinks = document.querySelector('.nav-links');
+      const searchInput = document.getElementById('searchInput');
+      const searchBtn = document.querySelector('.search-btn');
+      if (hamburger && navLinks) { hamburger.addEventListener('click', () => { hamburger.classList.toggle('active'); navLinks.classList.toggle('active'); }); document.querySelectorAll('.nav-link').forEach(link => link.addEventListener('click', () => { hamburger.classList.remove('active'); navLinks.classList.remove('active'); })); }
+      function performSearch() { if (searchInput && searchInput.value.trim()) window.location.href = `../movies/movies.html?search=${encodeURIComponent(searchInput.value)}`; }
+      if (searchInput) searchInput.addEventListener('keypress', e => { if (e.key === 'Enter') performSearch(); });
+      if (searchBtn) searchBtn.addEventListener('click', performSearch);
+    });
+  </script>
+  <script src="showtimes.js"></script>
+</body>
+</html>
