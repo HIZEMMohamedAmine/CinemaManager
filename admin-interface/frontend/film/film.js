@@ -81,25 +81,20 @@ if (form) {
         e.preventDefault();
         
         const formData = new FormData(form);
-        const data = Object.fromEntries(formData);
         const filmId = document.getElementById('film-id').value;
         
         try {
             let url = '../../backend/api/film/film.php';
             let method = 'POST';
             
-            // If editing an existing film
+            // If editing an existing film, append id to URL but keep method POST for file upload
             if (filmId) {
                 url += `?id=${filmId}`;
-                method = 'PUT';
             }
             
             const response = await fetch(url, {
                 method: method,
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
+                body: formData
             });
             
             const result = await response.text();
@@ -165,7 +160,8 @@ function editFilm(id) {
             document.querySelector('[name="genre"]').value = film.genre;
             document.querySelector('[name="duration_minutes"]').value = film.duration_minutes;
             document.querySelector('[name="classification"]').value = film.classification;
-            document.querySelector('[name="poster_url"]').value = film.poster_url || '';
+            // Reset the file input since we don't know the local path
+            document.querySelector('[name="poster_file"]').value = '';
             document.querySelector('[name="synopsis"]').value = film.synopsis || '';
             
             // Update modal title

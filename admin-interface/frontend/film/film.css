@@ -20,29 +20,13 @@ textarea:focus {
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
 }
 
-.table-container th:nth-child(1) {
-  width: 18%;
-}
-
-.table-container th:nth-child(2) {
-  width: 12%;
-}
-
-.table-container th:nth-child(3) {
-  width: 8%;
-}
-
-.table-container th:nth-child(4) {
-  width: 10%;
-}
-
-.table-container th:nth-child(5) {
-  width: 32%;
-}
-
-.table-container th:nth-child(6) {
-  width: 20%;
-}
+.table-container th:nth-child(1) { width: 6%; min-width: 60px; } /* Affiche */
+.table-container th:nth-child(2) { width: 22%; } /* Titre */
+.table-container th:nth-child(3) { width: 10%; } /* Genre */
+.table-container th:nth-child(4) { width: 8%; }  /* Durée */
+.table-container th:nth-child(5) { width: 8%; }  /* Classif */
+.table-container th:nth-child(6) { width: 28%; } /* Résumé */
+.table-container th:nth-child(7) { width: 18%; } /* Actions */
 
 .cell-preview {
   font-size: 0.88rem;
