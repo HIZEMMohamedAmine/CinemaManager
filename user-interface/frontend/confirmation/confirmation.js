@@ -44,11 +44,13 @@ class ConfirmationPage {
     document.getElementById('showDate').textContent = formattedDate;
     document.getElementById('showTime').textContent = booking.showtime.time;
 
-    // Seats
+    // Seats/Tickets
     const seatsDisplay = document.getElementById('seatsDisplay');
-    seatsDisplay.innerHTML = booking.seats
-      .map(seat => `<span class="seat-badge">${seat}</span>`)
-      .join('');
+    if(seatsDisplay) {
+        seatsDisplay.innerHTML = booking.seats
+          .map(seat => `<span class="seat-badge">${seat}</span>`)
+          .join('');
+    }
 
     // Customer Details
     document.getElementById('customerName').textContent = booking.customer.fullName;
@@ -56,17 +58,22 @@ class ConfirmationPage {
     document.getElementById('customerPhone').textContent = booking.customer.phone;
 
     // Price Details
-    const ticketPrice = 12; // Standard ticket price
-    const numSeats = booking.seats.length;
-    const subtotal = numSeats * ticketPrice;
-    const tax = subtotal * 0.05;
-    const total = parseFloat(booking.totalPrice);
+    let numSeats = 1;
+    let total = parseFloat(booking.totalPrice);
+    
+    // Extract the ticket count from our new payload format (e.g., "2 General Admission Ticket(s)")
+    if (booking.seats && booking.seats.length > 0) {
+        const match = booking.seats[0].match(/^(\d+)/);
+        if (match) {
+            numSeats = parseInt(match[1]);
+        }
+    }
+    
+    const ticketPrice = total / numSeats;
 
-    document.getElementById('ticketPrice').textContent = `$${ticketPrice}`;
+    document.getElementById('ticketPrice').textContent = `$${ticketPrice.toFixed(2)}`;
     document.getElementById('numSeats').textContent = numSeats;
-    document.getElementById('subtotal').textContent = `$${subtotal.toFixed(2)}`;
-    document.getElementById('taxAmount').textContent = `$${tax.toFixed(2)}`;
-    document.getElementById('totalAmount').textContent = `$${total}`;
+    document.getElementById('totalAmount').textContent = `$${total.toFixed(2)}`;
 
     // Page title
     document.title = `Booking Confirmation - CineMax`;

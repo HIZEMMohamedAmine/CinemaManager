@@ -3,23 +3,50 @@
 class HomePage {
   constructor() {
     this.currentSlide = 0;
-    this.movies = moviesData.nowShowing;
+    this.movies = [];
+    this.nowShowing = [];
+    this.comingSoon = [];
     this.init();
   }
 
-  init() {
-    this.setupCarousel();
+  async init() {
+    await this.fetchMovies();
+    if (this.movies.length > 0) {
+        this.setupCarousel();
+    }
     this.renderNowShowing();
     this.renderComingSoon();
     this.setupEventListeners();
   }
 
+  async fetchMovies() {
+      try {
+          const response = await fetch('../../backend/movies/get-movies.php');
+          const result = await response.json();
+          if (result.success) {
+              this.nowShowing = result.data.nowShowing;
+              this.comingSoon = result.data.comingSoon;
+              this.movies = this.nowShowing.length > 0 ? this.nowShowing : this.comingSoon; // Carousel needs something
+              
+              // Expose for other scripts if needed
+              window.moviesData = result.data; 
+          }
+      } catch (error) {
+          console.error("Error fetching movies:", error);
+      }
+  }
+
   setupCarousel() {
     const carouselTrack = document.getElementById('carouselTrack');
     const dotsContainer = document.getElementById('dots');
+    
+    if (!carouselTrack || !dotsContainer) return;
+    
+    carouselTrack.innerHTML = '';
+    dotsContainer.innerHTML = '';
 
     // Create slides
-    this.movies.forEach((movie, index) => {
+    this.movies.slice(0, 5).forEach((movie, index) => { // show up to 5 on carousel
       const slide = document.createElement('div');
       slide.className = 'carousel-slide';
       slide.style.backgroundImage = `url('${movie.banner}')`;
@@ -41,34 +68,44 @@ class HomePage {
   }
 
   updateHeroContent(index) {
+    if (this.movies.length === 0) return;
     const movie = this.movies[index];
     document.getElementById('heroTitle').textContent = movie.title;
     document.getElementById('heroDescription').textContent = movie.description;
 
     // Update buttons
-    document.getElementById('bookNow').onclick = () => {
-      window.location.href = `../movie-details/movie-details.html?id=${movie.id}`;
-    };
+    const bookBtn = document.getElementById('bookNow');
+    if (bookBtn) {
+        bookBtn.onclick = () => {
+          window.location.href = `../movie-details/movie-details.html?id=${movie.id}`;
+        };
+    }
 
-    document.getElementById('watchTrailer').onclick = () => {
-      this.showTrailer(movie.trailer);
-    };
+    const trailerBtn = document.getElementById('watchTrailer');
+    if (trailerBtn) {
+        trailerBtn.onclick = () => {
+          this.showTrailer(movie.trailer);
+        };
+    }
   }
 
   nextSlide() {
-    this.currentSlide = (this.currentSlide + 1) % this.movies.length;
+    if (this.movies.length === 0) return;
+    this.currentSlide = (this.currentSlide + 1) % Math.min(this.movies.length, 5);
     this.goToSlide(this.currentSlide);
   }
 
   prevSlide() {
-    this.currentSlide = (this.currentSlide - 1 + this.movies.length) % this.movies.length;
+    if (this.movies.length === 0) return;
+    const limit = Math.min(this.movies.length, 5);
+    this.currentSlide = (this.currentSlide - 1 + limit) % limit;
     this.goToSlide(this.currentSlide);
   }
 
   goToSlide(index) {
     this.currentSlide = index;
     const carouselTrack = document.getElementById('carouselTrack');
-    carouselTrack.style.transform = `translateX(-${index * 100}%)`;
+    if(carouselTrack) carouselTrack.style.transform = `translateX(-${index * 100}%)`;
 
     // Update dots
     document.querySelectorAll('.dot').forEach((dot, i) => {
@@ -80,9 +117,15 @@ class HomePage {
 
   renderNowShowing() {
     const grid = document.getElementById('nowShowingGrid');
+    if (!grid) return;
     grid.innerHTML = '';
 
-    moviesData.nowShowing.forEach(movie => {
+    if (this.nowShowing.length === 0) {
+        grid.innerHTML = '<p>No movies currently showing.</p>';
+        return;
+    }
+
+    this.nowShowing.forEach(movie => {
       const card = this.createMovieCard(movie);
       grid.appendChild(card);
     });
@@ -90,9 +133,15 @@ class HomePage {
 
   renderComingSoon() {
     const grid = document.getElementById('comingSoonGrid');
+    if (!grid) return;
     grid.innerHTML = '';
+    
+    if (this.comingSoon.length === 0) {
+        grid.innerHTML = '<p>No upcoming movies at the moment.</p>';
+        return;
+    }
 
-    moviesData.comingSoon.forEach(movie => {
+    this.comingSoon.forEach(movie => {
       const card = this.createMovieCard(movie, true);
       grid.appendChild(card);
     });
@@ -143,14 +192,18 @@ class HomePage {
   showTrailer(trailerUrl) {
     const modal = document.getElementById('trailerModal');
     const trailerVideo = document.getElementById('trailerVideo');
+    if (!modal || !trailerVideo) return;
+    
     trailerVideo.src = trailerUrl;
     modal.classList.add('active');
 
     const closeBtn = document.getElementById('closeModal');
-    closeBtn.addEventListener('click', () => {
-      modal.classList.remove('active');
-      trailerVideo.src = '';
-    });
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+          modal.classList.remove('active');
+          trailerVideo.src = '';
+        });
+    }
 
     modal.addEventListener('click', (e) => {
       if (e.target === modal) {
@@ -161,8 +214,11 @@ class HomePage {
   }
 
   setupEventListeners() {
-    document.getElementById('prevBtn').addEventListener('click', () => this.prevSlide());
-    document.getElementById('nextBtn').addEventListener('click', () => this.nextSlide());
+    const prevBtn = document.getElementById('prevBtn');
+    if (prevBtn) prevBtn.addEventListener('click', () => this.prevSlide());
+    
+    const nextBtn = document.getElementById('nextBtn');
+    if (nextBtn) nextBtn.addEventListener('click', () => this.nextSlide());
 
     // Newsletter
     const newsletterForm = document.getElementById('newsletterForm');

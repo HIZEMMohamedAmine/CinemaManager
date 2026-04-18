@@ -3,15 +3,121 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Book Tickets — CineMax</title>
-  <meta name="description" content="Reserve your cinema tickets and complete your booking at CineMax.">
+  <title>My Booking History — CineMax</title>
+  <meta name="description" content="View your past and upcoming movie reservations at CineMax.">
   <link rel="stylesheet" href="../css/global.css">
-  <link rel="stylesheet" href="booking.css">
   <link rel="stylesheet" href="../components/navbar/navbar.css">
   <link rel="stylesheet" href="../components/footer/footer.css">
+  <style>
+    .history-page {
+      padding-top: 100px;
+      min-height: 80vh;
+      background: var(--bg-color);
+      color: var(--text-color);
+      padding-bottom: 50px;
+    }
+    
+    .history-header {
+      background: linear-gradient(to right, #111827, #1f2937);
+      padding: 40px 0;
+      margin-bottom: 40px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .history-header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+      background: linear-gradient(90deg, #fff, #a855f7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .history-list {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .history-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      transition: all 0.3s ease;
+    }
+    
+    .history-card:hover {
+      border-color: var(--primary-color);
+      transform: translateY(-2px);
+    }
+
+    .history-poster {
+      width: 100px;
+      height: 150px;
+      border-radius: var(--radius-md);
+      object-fit: cover;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    }
+    
+    .history-details {
+      flex: 1;
+    }
+
+    .history-details h3 {
+      font-size: 1.5rem;
+      margin-bottom: 10px;
+    }
+
+    .history-meta {
+      font-size: 0.9rem;
+      color: #9ca3af;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-bottom: 10px;
+    }
+
+    .status-badge {
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      display: inline-block;
+    }
+
+    .status-badge.Confirmee { background: rgba(34, 197, 94, 0.1); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.2); }
+    .status-badge.Attente { background: rgba(234, 179, 8, 0.1); color: #eab308; border: 1px solid rgba(234, 179, 8, 0.2); }
+    .status-badge.Annulee { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-color);
+    }
+
+    .empty-state h2 {
+      font-size: 1.8rem;
+      margin-bottom: 15px;
+    }
+
+    .empty-state p {
+      color: #9ca3af;
+      margin-bottom: 25px;
+    }
+
+    @media (max-width: 768px) {
+      .history-card { flex-direction: column; text-align: center; }
+      .history-meta { justify-content: center; }
+    }
+  </style>
 </head>
-<body class="page-layout">
-  <!-- Master Navbar Component -->
+<body>
+  <!-- Navigation Bar -->
   <nav class="navbar-main">
     <div class="navbar-wrapper">
       <div class="navbar-content">
@@ -115,70 +221,21 @@
     </div>
   </nav>
 
-  <!-- Page Content -->
-  <div class="page-content navbar-offset">
-    <main class="booking-page">
-    <div class="booking-header">
+  <main class="history-page">
+    <div class="history-header">
       <div class="container">
-        <h1>Reserve Your Tickets</h1>
-        <p id="movieTitle" class="subtitle"></p>
+        <h1>My Bookings</h1>
+        <p class="subtitle" style="color: #9ca3af;">View and track all your cinema reservations.</p>
       </div>
     </div>
 
-    <div class="container booking-container">
-      <div class="booking-grid">
-        <div class="seat-selection-column">
-          <div class="booking-card">
-            <h2>Ticket Details</h2>
-            <div class="hall-info" style="margin-bottom: 20px;">
-              <p>Hall: <strong id="hallName"></strong></p>
-            </div>
-            <div class="form-group">
-                <label for="ticketCountInput" style="font-size: 1.1rem; font-weight: bold; display: block; margin-bottom: 10px;">Number of Tickets:</label>
-                <input type="number" id="ticketCountInput" class="form-control" min="1" max="10" value="1" style="font-size: 1.2rem; padding: 10px; max-width: 150px;">
-            </div>
-            <p style="color: #888; font-size: 0.9rem; margin-top: 10px;">Select up to 10 tickets per booking.</p>
-          </div>
-
-          <div class="booking-card" style="margin-top: 20px;">
-            <h2>Your Information</h2>
-            <form id="bookingForm">
-              <div class="form-row">
-                <div class="form-group"><label for="fullName">Full Name *</label><input type="text" id="fullName" name="fullName" class="form-control" required></div>
-                <div class="form-group"><label for="email">Email Address *</label><input type="email" id="email" name="email" class="form-control" required></div>
-              </div>
-              <div class="form-row">
-                <div class="form-group"><label for="phone">Phone Number *</label><input type="tel" id="phone" name="phone" class="form-control" required></div>
-                <div class="form-group"><label for="paymentMethod">Payment Method *</label>
-                  <select id="paymentMethod" name="paymentMethod" class="form-control" required disabled>
-                    <option value="cash" selected>Cash in Cinema</option>
-                  </select>
-                  <small style="color: #aaa; display:block; margin-top:5px;">Only cash payment on arrival is supported.</small>
-                </div>
-              </div>
-              <div class="form-group"><label><input type="checkbox" id="agreeTerms" required> I agree to the terms and conditions</label></div>
-            </form>
-          </div>
-        </div>
-
-        <div class="booking-summary-column">
-          <div class="booking-card sticky-summary">
-            <h2>Booking Summary</h2>
-            <div class="summary-section"><h3>Movie</h3><p id="summaryMovieTitle" class="summary-value"></p></div>
-            <div class="summary-section"><h3>Date & Time</h3><p id="summaryDateTime" class="summary-value"></p></div>
-            <div class="price-breakdown" style="border-top: none;">
-              <div class="price-row"><span>Ticket Price</span><span id="seatPrice">$0</span></div>
-              <div class="price-row"><span>Number of Tickets</span><span id="numSeats">1</span></div>
-              <div class="price-row total" style="margin-top: 15px;"><span>Total Price</span><span id="totalPrice">$0</span></div>
-            </div>
-            <button class="btn btn-success btn-block btn-large mt-md" id="submitBookingBtn">Complete Reservation</button>
-            <p class="terms-text">By continuing, you confirm your attendance and agree to pay upon arrival.</p>
-          </div>
-        </div>
+    <div class="container">
+      <div id="historyList" class="history-list">
+        <!-- Loader -->
+        <div style="text-align: center; padding: 40px; color: #9ca3af;">Loading your history...</div>
       </div>
     </div>
-    </main>
-  </div><!-- Close page-content -->
+  </main>
 
   <footer class="footer">
     <div class="footer-container">
@@ -188,12 +245,11 @@
         <div class="footer-section"><h3>Support</h3><ul><li><a href="#">FAQ</a></li><li><a href="#">Help Center</a></li><li><a href="#">Booking Terms</a></li><li><a href="#">Refund Policy</a></li></ul></div>
         <div class="footer-section"><h3>Contact</h3><p><strong>Location:</strong> 123 Cinema Street, Tunis</p><p><strong>Phone:</strong> +216 XX XXX XXXX</p><p><strong>Email:</strong> info@cinemax.tn</p><p><strong>Hours:</strong> 9 AM - 12 AM</p></div>
       </div>
-      <div class="footer-bottom"><p>&copy; 2026 CineMax. All rights reserved.</p><ul class="footer-links"><li><a href="#">Privacy Policy</a></li><li><a href="#">Terms of Service</a></li><li><a href="#">Cookie Settings</a></li></ul></div>
+      <div class="footer-bottom"><p>&copy; 2026 CineMax. All rights reserved.</p></div>
     </div>
   </footer>
 
-  <script src="../data/animations.js"></script>
-  <script>
+  <script src="../data/animations.js"></script>  <script>
     // Update navbar based on login state
     function updateNavbarUI() {
       const userSession = localStorage.getItem('userSession');
@@ -240,27 +296,15 @@
       window.location.href = '../index/index.html';
     }
 
-    // Initialize search functionality
     document.addEventListener('DOMContentLoaded', function() {
       // Update navbar on page load
       updateNavbarUI();
-      const searchInput = document.getElementById('searchInput');
-      const searchBtn = document.querySelector('.search-button');
-      
-      function performSearch() {
-        if (searchInput && searchInput.value.trim()) {
-          window.location.href = `../movies/movies.html?search=${encodeURIComponent(searchInput.value)}`;
-        }
-      }
-      if (searchInput) searchInput.addEventListener('keypress', e => { if (e.key === 'Enter') performSearch(); });
-      if (searchBtn) searchBtn.addEventListener('click', performSearch);
     });
   </script>
   
   <!-- Navigation Sync Utility -->
-  <script src="../components/nav-sync.js"></script>
+  <script src=\"../components/nav-sync.js\"></script>
   
-  <!-- Page Script -->
-  <script src="./booking.js"></script>
+  <script src=\"history.js\"></script>
 </body>
 </html>

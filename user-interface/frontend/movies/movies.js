@@ -3,48 +3,62 @@
 class MoviesPage {
   constructor() {
     this.allMovies = [];
+    this.nowShowing = [];
+    this.comingSoon = [];
     this.filteredMovies = [];
     this.filters = {
       genre: '',
-      status: '',
-      rating: ''
+      status: ''
     };
     this.init();
   }
 
-  init() {
+  async init() {
+    await this.fetchMovies();
     this.loadMovies();
     this.setupEventListeners();
-    this.renderMovies();
     this.handleSearch();
+    this.renderMovies();
+  }
+
+  async fetchMovies() {
+      try {
+          const response = await fetch('../../backend/movies/get-movies.php');
+          const result = await response.json();
+          if (result.success) {
+              this.nowShowing = result.data.nowShowing;
+              this.comingSoon = result.data.comingSoon;
+          }
+      } catch (error) {
+          console.error("Error fetching movies:", error);
+      }
   }
 
   loadMovies() {
-    this.allMovies = [...moviesData.nowShowing, ...moviesData.comingSoon];
+    this.allMovies = [...this.nowShowing, ...this.comingSoon];
     this.filteredMovies = this.allMovies;
   }
 
   setupEventListeners() {
-    document.getElementById('genreFilter').addEventListener('change', (e) => {
+    const genreFilter = document.getElementById('genreFilter');
+    if(genreFilter) genreFilter.addEventListener('change', (e) => {
       this.filters.genre = e.target.value;
       this.applyFilters();
     });
 
-    document.getElementById('statusFilter').addEventListener('change', (e) => {
+    const statusFilter = document.getElementById('statusFilter');
+    if(statusFilter) statusFilter.addEventListener('change', (e) => {
       this.filters.status = e.target.value;
       this.applyFilters();
     });
 
-    document.getElementById('ratingFilter').addEventListener('change', (e) => {
-      this.filters.rating = e.target.value;
-      this.applyFilters();
-    });
-
-    document.getElementById('resetFilters').addEventListener('click', () => {
+    const resetFilters = document.getElementById('resetFilters');
+    if(resetFilters) resetFilters.addEventListener('click', () => {
       this.resetFilters();
     });
 
-    document.getElementById('clearFiltersBtn').addEventListener('click', () => {
+    const clearFiltersBtn = document.getElementById('clearFiltersBtn');
+    if(clearFiltersBtn) clearFiltersBtn.addEventListener('click', () => {
       this.resetFilters();
     });
   }
@@ -58,16 +72,9 @@ class MoviesPage {
 
       // Status filter
       if (this.filters.status) {
-        const isNowShowing = moviesData.nowShowing.some(m => m.id === movie.id);
+        const isNowShowing = this.nowShowing.some(m => m.id === movie.id);
         if (this.filters.status === 'now' && !isNowShowing) return false;
         if (this.filters.status === 'coming' && isNowShowing) return false;
-      }
-
-      // Rating filter
-      if (this.filters.rating) {
-        if (!movie.rating || movie.rating < parseFloat(this.filters.rating)) {
-          return false;
-        }
       }
 
       return true;
@@ -79,13 +86,14 @@ class MoviesPage {
   resetFilters() {
     this.filters = {
       genre: '',
-      status: '',
-      rating: ''
+      status: ''
     };
 
-    document.getElementById('genreFilter').value = '';
-    document.getElementById('statusFilter').value = '';
-    document.getElementById('ratingFilter').value = '';
+    const genreFilter = document.getElementById('genreFilter');
+    if(genreFilter) genreFilter.value = '';
+    
+    const statusFilter = document.getElementById('statusFilter');
+    if(statusFilter) statusFilter.value = '';
 
     this.filteredMovies = this.allMovies;
     this.renderMovies();
@@ -95,6 +103,8 @@ class MoviesPage {
     const grid = document.getElementById('moviesGrid');
     const noResults = document.getElementById('noResults');
     const resultCount = document.getElementById('resultCount');
+    
+    if (!grid || !noResults || !resultCount) return;
 
     if (this.filteredMovies.length === 0) {
       grid.style.display = 'none';
@@ -110,7 +120,7 @@ class MoviesPage {
     grid.innerHTML = '';
 
     this.filteredMovies.forEach(movie => {
-      const isComingSoon = moviesData.comingSoon.some(m => m.id === movie.id);
+      const isComingSoon = this.comingSoon.some(m => m.id === movie.id);
       const card = this.createMovieCard(movie, isComingSoon);
       grid.appendChild(card);
     });
@@ -119,15 +129,6 @@ class MoviesPage {
   createMovieCard(movie, isComingSoon = false) {
     const card = document.createElement('div');
     card.className = 'movie-card fade-in';
-
-    const ratingHTML = movie.rating
-      ? `
-        <div class="movie-rating">
-          <span class="rating-stars">★★★★★</span>
-          <span class="rating-value">${movie.rating}</span>
-        </div>
-      `
-      : '<div class="movie-rating"><span class="rating-value">Coming Soon</span></div>';
 
     const buttonHTML = isComingSoon
       ? `<button class="btn btn-secondary btn-small" style="cursor: default;">Coming Soon</button>`
@@ -141,8 +142,7 @@ class MoviesPage {
           <span class="movie-genre">${movie.genre}</span>
           <span class="movie-duration">${movie.duration}</span>
         </div>
-        ${ratingHTML}
-        <div class="movie-card-footer">
+        <div class="movie-card-footer" style="margin-top: 15px;">
           ${buttonHTML}
         </div>
       </div>
@@ -166,7 +166,6 @@ class MoviesPage {
         movie.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         movie.description.toLowerCase().includes(searchQuery.toLowerCase())
       );
-      this.renderMovies();
     }
   }
 }

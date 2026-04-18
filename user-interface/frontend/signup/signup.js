@@ -44,7 +44,12 @@ function handleSignup(e) {
     },
     body: JSON.stringify({ username, password })
   })
-  .then(response => response.json())
+  .then(response => {
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+    return response.json();
+  })
   .then(data => {
     btn.textContent = 'Créer mon compte';
     btn.disabled = false;
@@ -62,7 +67,8 @@ function handleSignup(e) {
   .catch(error => {
     btn.textContent = 'Créer mon compte';
     btn.disabled = false;
-    showToast('✗ Erreur de connexion au serveur', 3000);
+    console.error('Signup error:', error);
+    showToast('✗ Erreur: ' + error.message, 3000);
     console.error(error);
   });
 }

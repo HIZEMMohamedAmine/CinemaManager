@@ -6,134 +6,232 @@
   <title>CineMax — Premium Cinema Experience</title>
   <meta name="description" content="Experience cinema like never before. Book tickets, browse movies, and enjoy premium showtimes at CineMax.">
   <link rel="stylesheet" href="../css/global.css">
-  <link rel="stylesheet" href="index.css">
+  <link rel="stylesheet" href="./index.css">
   <link rel="stylesheet" href="../components/navbar/navbar.css">
   <link rel="stylesheet" href="../components/footer/footer.css">
 </head>
-<body>
-  <!-- Top Search Bar -->
-  <div class="top-bar">
-    <div class="top-bar-container">
-      <a href="../index/index.html" class="logo">CINEMAX</a>
-      
-      <div class="search-container">
-        <input type="text" id="searchInput" placeholder="Search movies, genres..." class="search-input">
-        <button class="search-btn">Search</button>
-      </div>
-      
-      <div class="shortcuts">
-        <a href="../index/index.html" class="shortcut-btn">Home</a>
-        <a href="../movies/movies.html" class="shortcut-btn">Browse</a>
-        <a href="../showtimes/showtimes.html" class="shortcut-btn">Showtimes</a>
-      </div>
-    </div>
-  </div>
+<body class="cinemax-body page-layout">
+  <!-- Master Navbar Component -->
+  <nav class="navbar-main">
+    <div class="navbar-wrapper">
+      <div class="navbar-content">
+        
+        <!-- Left Section: Logo -->
+        <a href="./index.html" class="navbar-logo">
+          CINEMAX
+        </a>
+        
+        <!-- Center Section: Navigation Menu -->
+        <ul class="navbar-menu">
+          <li>
+            <a href="./index.html" class="navbar-link" data-nav="home">
+              Home
+              <span class="navbar-underline"></span>
+            </a>
+          </li>
+          <li>
+            <a href="../movies/movies.html" class="navbar-link" data-nav="movies">
+              Movies
+              <span class="navbar-underline"></span>
+            </a>
+          </li>
+          <li>
+            <a href="../showtimes/showtimes.html" class="navbar-link" data-nav="showtimes">
+              Showtimes
+              <span class="navbar-underline"></span>
+            </a>
+          </li>
+        </ul>
+        
+        <!-- Right Section: Search, Profile Dropdown, Logout -->
+        <div class="navbar-right">
+          
+          <!-- Search Bar -->
+          <div class="search-wrapper">
+            <input 
+              type="text" 
+              id="searchInput" 
+              placeholder="Search movies..." 
+              class="search-input"
+            >
+            <button class="search-button" aria-label="Search">
+              <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              </svg>
+            </button>
+          </div>
+          
+          <!-- Profile Dropdown -->
+          <div class="profile-dropdown" id="profileDropdown">
+            <button class="profile-button" aria-label="User profile">
+              <span class="profile-avatar" id="profileAvatar">C</span>
+              <span class="profile-name" id="profileName">chandoul</span>
+              <svg class="profile-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+              </svg>
+            </button>
+            
+            <!-- Dropdown Menu -->
+            <div class="dropdown-menu">
+              <div class="dropdown-header">
+                <p class="dropdown-label">Logged in as</p>
+                <p class="dropdown-username" id="dropdownUsername">chandoul</p>
+              </div>
+              <a href="#profile" class="dropdown-item">
+                <svg class="dropdown-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                </svg>
+                My Profile
+              </a>
+              <a href="../history/history.html" class="dropdown-item">
+                <svg class="dropdown-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                My Bookings
+              </a>
+              <div class="dropdown-divider"></div>
+              <button onclick="handleLogout()" class="dropdown-item logout" style="background: none; border: none; width: 100%; text-align: left; cursor: pointer; padding: 0.625rem 1rem; font-size: 0.875rem; color: #f87171;">
+                <svg class="dropdown-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                </svg>
+                Logout
+              </button>
+            </div>
+          </div>
 
-  <!-- Navigation Bar -->
-  <nav class="navbar">
-    <div class="navbar-container">
-      <ul class="nav-links">
-        <li><a href="../index/index.html" class="nav-link active">Home</a></li>
-        <li><a href="../movies/movies.html" class="nav-link">Movies</a></li>
-        <li><a href="../showtimes/showtimes.html" class="nav-link">Showtimes</a></li>
-      </ul>
-      
-      <div class="auth-buttons">
-        <a href="../login/login.html" class="btn btn-login">🔐 Login</a>
-      </div>
-      
-      <div class="hamburger" id="hamburger">
-        <span></span>
-        <span></span>
-        <span></span>
+          <!-- Login Button (shown when not logged in) -->
+          <a href="../login/login.html" class="btn btn-primary" id="loginButton" style="display: none;">
+            🔐 Login
+          </a>
+          
+          <!-- Mobile Hamburger -->
+          <button id="hamburger" class="hamburger-menu" aria-label="Toggle menu">
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+        </div>
       </div>
     </div>
   </nav>
 
-  <!-- Hero Section with Carousel -->
-  <section class="hero">
-    <div class="hero-carousel">
-      <div class="carousel-track" id="carouselTrack">
-        <!-- Slides will be generated by JavaScript -->
+  <!-- Page Content -->
+  <div class="page-content navbar-offset">
+    
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <!-- Carousel Background -->
+      <div class="hero-carousel-wrapper">
+        <div class="carousel-track" id="carouselTrack">
+          <!-- Slides will be generated by JavaScript -->
+        </div>
+        
+        <!-- Left-to-Right Dark Gradient Overlay -->
+        <div class="hero-gradient-overlay"></div>
       </div>
-      <button class="carousel-btn prev" id="prevBtn">❮</button>
-      <button class="carousel-btn next" id="nextBtn">❯</button>
-      <div class="carousel-dots" id="dots"></div>
-    </div>
-
-    <div class="hero-content">
-      <h1 id="heroTitle" class="hero-title"></h1>
-      <p id="heroDescription" class="hero-description"></p>
-      <div class="hero-actions">
-        <button class="btn btn-primary" id="watchTrailer">▶ Watch Trailer</button>
-        <button class="btn btn-secondary" id="bookNow">Reserve Now</button>
+      
+      <!-- Carousel Navigation Buttons -->
+      <button id="prevBtn" class="carousel-btn carousel-btn-prev">❮</button>
+      <button id="nextBtn" class="carousel-btn carousel-btn-next">❯</button>
+      
+      <!-- Hero Content - Left Aligned -->
+      <div class="hero-content-wrapper">
+        <div class="content-container">
+          <div class="hero-text-block">
+            <!-- Title -->
+            <h1 id="heroTitle" class="hero-title">
+              <!-- Content from JS -->
+            </h1>
+            
+            <!-- Description -->
+            <p id="heroDescription" class="hero-description">
+              <!-- Content from JS -->
+            </p>
+            
+            <!-- Action Buttons -->
+            <div class="hero-buttons">
+              <!-- Watch Trailer (Primary Filled) -->
+              <button id="watchTrailer" class="hero-btn hero-btn-primary">
+                <svg class="hero-btn-icon" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M8 5v14l11-7z"></path>
+                </svg>
+                Watch Trailer
+              </button>
+              
+              <!-- Reserve Now (Outline/Ghost) -->
+              <button id="bookNow" class="hero-btn hero-btn-secondary">
+                <svg class="hero-btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                </svg>
+                Reserve Now
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
-  </section>
+      
+      <!-- Carousel Pagination Indicators (Bottom Center) -->
+      <div class="carousel-dots-wrapper" id="dots">
+        <!-- Dots will be generated by JavaScript -->
+      </div>
+    </section><!-- Close hero-section -->
 
   <!-- Now Showing Section -->
-  <section class="section movies-section">
-    <div class="container">
-      <div class="section-title">
-        <h2>🎬 Now Showing</h2>
+  <section class="section-main section-now-showing section-padding">
+    <div class="content-container">
+      <div class="section-header">
+        <h2 class="section-title section-title-gradient">🎬 Now Showing</h2>
       </div>
-      <div class="grid grid-auto" id="nowShowingGrid">
+      <div class="grid-container grid-auto-4" id="nowShowingGrid">
         <!-- Movie cards will be generated here -->
       </div>
     </div>
   </section>
 
   <!-- Coming Soon Section -->
-  <section class="section movies-section coming-soon">
-    <div class="container">
-      <div class="section-title">
-        <h2>🚀 Coming Soon</h2>
+  <section class="section-main section-coming-soon section-padding">
+    <div class="content-container">
+      <div class="section-header">
+        <h2 class="section-title section-title-gradient-alt">🚀 Coming Soon</h2>
       </div>
-      <div class="grid grid-auto" id="comingSoonGrid">
+      <div class="grid-container grid-auto-4" id="comingSoonGrid">
         <!-- Movie cards will be generated here -->
       </div>
     </div>
   </section>
 
   <!-- Features Section -->
-  <section class="section features-section">
-    <div class="container">
-      <div class="section-title">
-        <h2>Why Choose CineMax?</h2>
+  <section class="section-main section-features section-padding">
+    <div class="content-container">
+      <div class="section-header">
+        <h2 class="section-title">Why Choose CineMax?</h2>
       </div>
-      <div class="grid grid-3">
-        <div class="feature-card reveal">
+      <div class="grid-container grid-3">
+        
+        <!-- Premium Quality Card -->
+        <div class="feature-card">
           <div class="feature-icon">🎥</div>
-          <h3>Premium Quality</h3>
-          <p>Experience movies in stunning 4K resolution with Dolby Atmos sound systems.</p>
+          <h3 class="feature-title">Premium Quality</h3>
+          <p class="feature-text">Experience movies in stunning 4K resolution with Dolby Atmos sound systems.</p>
         </div>
-        <div class="feature-card reveal" data-delay="100">
+        
+        <!-- Comfort First Card -->
+        <div class="feature-card">
           <div class="feature-icon">💺</div>
-          <h3>Comfort First</h3>
-          <p>Luxury reclinable seats with ample legroom for the ultimate cinema experience.</p>
+          <h3 class="feature-title">Comfort First</h3>
+          <p class="feature-text">Luxury reclinable seats with ample legroom for the ultimate cinema experience.</p>
         </div>
-        <div class="feature-card reveal" data-delay="200">
+        
+        <!-- Easy Booking Card -->
+        <div class="feature-card">
           <div class="feature-icon">⏰</div>
-          <h3>Easy Booking</h3>
-          <p>Simple online reservation system with multiple payment options available.</p>
+          <h3 class="feature-title">Easy Booking</h3>
+          <p class="feature-text">Simple online reservation system with multiple payment options available.</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Newsletter Section -->
-  <section class="section newsletter-section">
-    <div class="container">
-      <div class="newsletter-card reveal-scale">
-        <h2>Subscribe to Our Newsletter</h2>
-        <p>Get exclusive offers, movie reviews, and early access to special events</p>
-        <form class="newsletter-form" id="newsletterForm">
-          <input type="email" placeholder="Enter your email" required>
-          <button type="submit" class="btn btn-primary">Subscribe</button>
-        </form>
-      </div>
-    </div>
-  </section>
 
   <!-- Footer -->
   <footer class="footer">
@@ -153,7 +251,7 @@
         <div class="footer-section">
           <h3>Quick Links</h3>
           <ul>
-            <li><a href="../index/index.html">Home</a></li>
+            <li><a href="./index.html">Home</a></li>
             <li><a href="../movies/movies.html">Movies</a></li>
             <li><a href="../showtimes/showtimes.html">Showtimes</a></li>
             <li><a href="#contact">Contact</a></li>
@@ -198,30 +296,62 @@
     </div>
   </div>
 
-  <script src="../data/movies.js"></script>
   <script src="../data/animations.js"></script>
   <script>
-    // Initialize navbar
-    document.addEventListener('DOMContentLoaded', function() {
-      const hamburger = document.getElementById('hamburger');
-      const navLinks = document.querySelector('.nav-links');
-      const searchInput = document.getElementById('searchInput');
-      const searchBtn = document.querySelector('.search-btn');
+    // Update navbar based on login state
+    function updateNavbarUI() {
+      const userSession = localStorage.getItem('userSession');
+      const profileDropdown = document.getElementById('profileDropdown');
+      const loginButton = document.getElementById('loginButton');
       
-      if (hamburger && navLinks) {
-        hamburger.addEventListener('click', function() {
-          hamburger.classList.toggle('active');
-          navLinks.classList.toggle('active');
-        });
-
-        document.querySelectorAll('.nav-link').forEach(link => {
-          link.addEventListener('click', function() {
-            hamburger.classList.remove('active');
-            navLinks.classList.remove('active');
-          });
-        });
+      if (userSession) {
+        try {
+          const user = JSON.parse(userSession);
+          if (user && user.username) {
+            // User is logged in - show profile dropdown
+            document.getElementById('profileName').textContent = user.username;
+            document.getElementById('dropdownUsername').textContent = user.username;
+            document.getElementById('profileAvatar').textContent = user.username.charAt(0).toUpperCase();
+            
+            profileDropdown.style.display = 'block';
+            loginButton.style.display = 'none';
+          } else {
+            // Invalid session - show login button
+            profileDropdown.style.display = 'none';
+            loginButton.style.display = 'block';
+          }
+        } catch (e) {
+          // Corrupted session - show login button
+          profileDropdown.style.display = 'none';
+          loginButton.style.display = 'block';
+        }
+      } else {
+        // No user logged in - show login button
+        profileDropdown.style.display = 'none';
+        loginButton.style.display = 'block';
       }
+    }
 
+    // Global logout handler
+    function handleLogout() {
+      // Clear all user session data
+      localStorage.removeItem('userSession');
+      localStorage.removeItem('selectedMovie');
+      localStorage.removeItem('selectedShowtime');
+      // Update navbar UI
+      updateNavbarUI();
+      // Optional: reload page to ensure clean state
+      window.location.href = './index.html';
+    }
+
+    // Initialize search functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      // Update navbar on page load
+      updateNavbarUI();
+
+      const searchInput = document.getElementById('searchInput');
+      const searchBtn = document.querySelector('.search-button');
+      
       function performSearch() {
         if (searchInput && searchInput.value.trim()) {
           const query = searchInput.value;
@@ -243,10 +373,16 @@
 
       // Initialize particles on hero
       if (window.CineMaxAnimations) {
-        CineMaxAnimations.initParticles('.hero');
+        CineMaxAnimations.initParticles('.hero-section');
       }
     });
   </script>
-  <script src="index.js"></script>
+  </div><!-- Close page-content -->
+  
+  <!-- Navigation Sync Utility -->
+  <script src="../components/nav-sync.js"></script>
+  
+  <!-- Page Script -->
+  <script src="./index.js"></script>
 </body>
 </html>

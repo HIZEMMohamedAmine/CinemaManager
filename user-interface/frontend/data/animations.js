@@ -154,10 +154,36 @@
     });
   }
 
+  // ─── Shared Auth State UI ───
+  function initAuthState() {
+    const authContainers = document.querySelectorAll('.auth-buttons');
+    if (!authContainers.length) return;
+
+    const userSession = window.localStorage.getItem('userSession');
+    if (userSession) {
+      try {
+        const user = JSON.parse(userSession);
+        if (user && user.username) {
+          const content = `
+            <div style="display: flex; align-items: center; gap: 15px;">
+              <span style="color: white; font-weight: 500;">Welcome, ${user.username}</span>
+              <a href="../history/history.html" class="btn" style="background: rgba(168, 85, 247, 0.1); color: #a855f7; border: 1px solid rgba(168, 85, 247, 0.3); padding: 0.5rem 1rem; border-radius: 6px; text-decoration: none; font-weight: 600;">My Bookings</a>
+              <button class="btn btn-login" style="background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); padding: 0.5rem 1.25rem;" onclick="localStorage.removeItem('userSession'); window.location.reload();">Logout</button>
+            </div>
+          `;
+          authContainers.forEach(container => {
+            container.innerHTML = content;
+          });
+        }
+      } catch(e) {}
+    }
+  }
+
   // ─── Initialize Everything ───
   function init() {
     initNavbarScroll();
     initCardStagger();
+    initAuthState();
 
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', () => {
@@ -175,7 +201,8 @@
     initParticles,
     animateCounter,
     initPageTransition,
-    initCardStagger
+    initCardStagger,
+    initAuthState
   };
 
   init();

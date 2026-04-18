@@ -1,20 +1,42 @@
 // Booking Page JavaScript
 
+// Booking Page JavaScript
+
 class BookingPage {
   constructor() {
     this.movie = null;
     this.showtime = null;
-    this.selectedSeats = [];
-    this.ticketPrice = ticketPrices.standard;
-    this.hall = cinemaHalls[0];
+    this.ticketCount = 1;
+    this.ticketPrice = 12; // default
+    this.hall = { name: "Standard Hall" }; // default
     this.init();
   }
 
   init() {
+    const userSession = localStorage.getItem('userSession');
+    if (!userSession) {
+      alert("You must be logged in to book a ticket.");
+      window.location.href = '../login/login.html';
+      return;
+    }
+
+    this.checkLoginState(userSession);
     this.loadBookingData();
-    this.renderSeats();
     this.setupEventListeners();
     this.updateSummary();
+  }
+
+  checkLoginState(userSessionData) {
+    try {
+        const user = JSON.parse(userSessionData);
+        if(user && user.username) {
+            // Pre-fill name and lock it if possible
+            const nameField = document.getElementById('fullName');
+            if(nameField) {
+                nameField.value = user.username;
+            }
+        }
+    } catch(e) {}
   }
 
   loadBookingData() {
@@ -29,9 +51,20 @@ class BookingPage {
     this.movie = JSON.parse(movieData);
     this.showtime = JSON.parse(showtimeData);
 
+    if (this.showtime.price) {
+        this.ticketPrice = parseFloat(this.showtime.price);
+    }
+    
+    if (this.showtime.room) {
+        this.hall.name = this.showtime.room;
+    }
+
     // Update page content
-    document.getElementById('movieTitle').textContent = this.movie.title;
-    document.getElementById('summaryMovieTitle').textContent = this.movie.title;
+    const titleEl = document.getElementById('movieTitle');
+    if(titleEl) titleEl.textContent = this.movie.title;
+    
+    const summaryTitleEl = document.getElementById('summaryMovieTitle');
+    if(summaryTitleEl) summaryTitleEl.textContent = this.movie.title;
 
     const dateObj = new Date(this.showtime.date);
     const formattedDate = dateObj.toLocaleDateString('en-US', {
@@ -40,148 +73,117 @@ class BookingPage {
       day: 'numeric'
     });
     const dateTimeStr = `${formattedDate} at ${this.showtime.time}`;
-    document.getElementById('summaryDateTime').textContent = dateTimeStr;
+    
+    const summaryDateEl = document.getElementById('summaryDateTime');
+    if(summaryDateEl) summaryDateEl.textContent = dateTimeStr;
 
-    document.getElementById('hallName').textContent = this.hall.name;
-  }
-
-  renderSeats() {
-    const seatsContainer = document.getElementById('seatsContainer');
-    seatsContainer.innerHTML = '';
-
-    // Simulate some reserved seats
-    const reservedSeats = new Set([2, 5, 8, 12, 15, 18, 22, 25, 28, 32, 35, 38]);
-
-    for (let row = 0; row < this.hall.rows; row++) {
-      const rowDiv = document.createElement('div');
-      rowDiv.className = 'seat-row';
-
-      for (let col = 0; col < this.hall.cols; col++) {
-        const seatButton = document.createElement('button');
-        const seatNumber = row * this.hall.cols + col;
-        const seatLabel = String.fromCharCode(65 + row) + (col + 1);
-
-        seatButton.type = 'button';
-        seatButton.className = 'seat available';
-        seatButton.textContent = seatLabel.charAt(0);
-        seatButton.dataset.seat = seatLabel;
-        seatButton.dataset.seatNumber = seatNumber;
-
-        if (reservedSeats.has(seatNumber)) {
-          seatButton.classList.remove('available');
-          seatButton.classList.add('reserved');
-          seatButton.disabled = true;
-        } else {
-          seatButton.addEventListener('click', (e) => {
-            e.preventDefault();
-            this.toggleSeat(seatButton, seatLabel);
-          });
-        }
-
-        rowDiv.appendChild(seatButton);
-      }
-
-      seatsContainer.appendChild(rowDiv);
-    }
-  }
-
-  toggleSeat(seatButton, seatLabel) {
-    if (seatButton.classList.contains('selected')) {
-      seatButton.classList.remove('selected');
-      this.selectedSeats = this.selectedSeats.filter(s => s !== seatLabel);
-    } else {
-      seatButton.classList.add('selected');
-      this.selectedSeats.push(seatLabel);
-    }
-
-    this.updateSummary();
+    const hallEl = document.getElementById('hallName');
+    if(hallEl) hallEl.textContent = this.hall.name;
   }
 
   updateSummary() {
-    const numSeats = this.selectedSeats.length;
-    const subtotal = numSeats * this.ticketPrice;
-    const tax = subtotal * 0.05;
-    const total = subtotal + tax;
-
-    // Update selected seats list
-    const selectedSeatsDiv = document.getElementById('selectedSeats');
-    if (numSeats === 0) {
-      selectedSeatsDiv.innerHTML = '<p class="text-secondary">No seats selected</p>';
-    } else {
-      selectedSeatsDiv.innerHTML = this.selectedSeats
-        .map(seat => `<span class="seat-badge">${seat}</span>`)
-        .join('');
-    }
+    const total = this.ticketCount * this.ticketPrice;
 
     // Update prices
-    document.getElementById('seatPrice').textContent = `$${this.ticketPrice}`;
-    document.getElementById('numSeats').textContent = numSeats;
-    document.getElementById('taxAmount').textContent = `$${tax.toFixed(2)}`;
-    document.getElementById('totalPrice').textContent = `$${total.toFixed(2)}`;
-
-    // Enable/disable continue button
-    const continueBtn = document.getElementById('continueBtn');
-    continueBtn.disabled = numSeats === 0;
+    const seatPriceEl = document.getElementById('seatPrice');
+    if(seatPriceEl) seatPriceEl.textContent = `$${this.ticketPrice.toFixed(2)}`;
+    
+    const numSeatsEl = document.getElementById('numSeats');
+    if(numSeatsEl) numSeatsEl.textContent = this.ticketCount;
+    
+    const totalEl = document.getElementById('totalPrice');
+    if(totalEl) totalEl.textContent = `$${total.toFixed(2)}`;
   }
 
   setupEventListeners() {
-    const bookingForm = document.getElementById('bookingForm');
-    bookingForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      this.submitBooking();
-    });
+    const input = document.getElementById('ticketCountInput');
+    if (input) {
+        input.addEventListener('change', (e) => {
+            let val = parseInt(e.target.value);
+            if (isNaN(val) || val < 1) val = 1;
+            if (val > 10) val = 10;
+            e.target.value = val;
+            this.ticketCount = val;
+            this.updateSummary();
+        });
+    }
 
-    const continueBtn = document.getElementById('continueBtn');
-    continueBtn.addEventListener('click', () => {
-      document.querySelector('.booking-form-section').scrollIntoView({ behavior: 'smooth' });
-    });
+    const submitBtn = document.getElementById('submitBookingBtn');
+    if (submitBtn) {
+        submitBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          this.submitBooking();
+        });
+    }
   }
 
-  submitBooking() {
-    if (this.selectedSeats.length === 0) {
-      alert('Please select at least one seat');
-      return;
+  async submitBooking() {
+    const form = document.getElementById('bookingForm');
+    if(form && !form.checkValidity()) {
+        form.reportValidity();
+        return;
     }
 
     // Get form data
     const fullName = document.getElementById('fullName').value;
     const email = document.getElementById('email').value;
     const phone = document.getElementById('phone').value;
-    const paymentMethod = document.getElementById('paymentMethod').value;
+    
+    const totalAmount = this.ticketCount * this.ticketPrice;
 
-    // Validate
-    if (!fullName || !email || !phone || !paymentMethod) {
-      alert('Please fill in all required fields');
-      return;
-    }
-
-    // Create booking object
-    const booking = {
-      bookingId: 'BK' + Math.floor(Math.random() * 1000000),
-      movie: this.movie,
-      showtime: this.showtime,
-      seats: this.selectedSeats,
-      customer: {
-        fullName,
-        email,
-        phone
-      },
-      paymentMethod,
-      bookingDate: new Date().toISOString(),
-      totalPrice: this.calculateTotal()
+    const payload = {
+        seance_id: this.showtime.id,
+        customer_name: fullName,
+        customer_email: email,
+        tickets_count: this.ticketCount,
+        total_amount: totalAmount
     };
 
-    // Store booking data
-    localStorage.setItem('booking', JSON.stringify(booking));
+    console.log('Booking payload:', payload);
 
-    // Redirect to confirmation
-    window.location.href = '../confirmation/confirmation.html';
-  }
+    try {
+        const response = await fetch('../../backend/movies/api-book.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        
+        console.log('API Response status:', response.status);
+        const result = await response.json();
+        
+        console.log('API Response:', result);
 
-  calculateTotal() {
-    const subtotal = this.selectedSeats.length * this.ticketPrice;
-    const tax = subtotal * 0.05;
-    return (subtotal + tax).toFixed(2);
+        if (result.success) {
+            // Create booking object for confirmation page
+            const booking = {
+              bookingId: result.booking_code,
+              movie: this.movie,
+              showtime: this.showtime,
+              seats: [`${this.ticketCount} General Admission Ticket(s)`],
+              customer: {
+                fullName,
+                email,
+                phone
+              },
+              paymentMethod: 'Cash',
+              bookingDate: new Date().toISOString(),
+              totalPrice: totalAmount.toFixed(2)
+            };
+
+            // Store booking data
+            localStorage.setItem('booking', JSON.stringify(booking));
+
+            // Redirect to confirmation
+            window.location.href = '../confirmation/confirmation.html';
+        } else {
+            const errorMsg = result.message || 'Unknown error - check browser console for details';
+            alert('Failed to book: ' + errorMsg);
+            console.error('Booking error details:', result);
+        }
+    } catch (e) {
+        console.error('Error submitting booking', e);
+        alert('Server error while submitting your booking. Check browser console (F12) for more details.');
+    }
   }
 }
 

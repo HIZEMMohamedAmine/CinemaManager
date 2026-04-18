@@ -38,7 +38,12 @@ function handleSubmit(e) {
     },
     body: JSON.stringify({ username, password })
   })
-  .then(response => response.json())
+  .then(response => {
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+    return response.json();
+  })
   .then(data => {
     btn.textContent = 'Se connecter';
     btn.disabled = false;
@@ -46,11 +51,17 @@ function handleSubmit(e) {
     if (data.success) {
       showToast(`✓ Connecté avec succès`, 2000);
       
+      // Store user session in localStorage
+      localStorage.setItem('userSession', JSON.stringify({
+          username: username,
+          role: data.role
+      }));
+
       setTimeout(() => {
         if (data.role === 'admin') {
           window.location.href = '../../../admin-interface/frontend/main/main.html';
         } else {
-          window.location.href = '../main/main.html';
+          window.location.href = '../index/index.html';
         }
       }, 1000);
     } else {
@@ -60,7 +71,7 @@ function handleSubmit(e) {
   .catch(error => {
     btn.textContent = 'Se connecter';
     btn.disabled = false;
-    showToast('✗ Erreur de connexion au serveur', 3000);
-    console.error(error);
+    console.error('Login error:', error);
+    showToast('✗ Erreur: ' + error.message, 3000);
   });
 }

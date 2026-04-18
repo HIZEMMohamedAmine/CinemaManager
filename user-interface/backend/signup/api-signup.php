@@ -1,5 +1,19 @@
 <?php
-header('Content-Type: application/json');
+declare(strict_types=1);
+
+// Only output JSON
+header('Content-Type: application/json; charset=utf-8');
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Headers: Content-Type, Authorization');
+header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
+
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(204);
+    exit;
+}
+
+error_reporting(E_ALL);
+ini_set('display_errors', '0');
 
 $host = '127.0.0.1';
 $dbname = 'cinemamanager';
@@ -7,40 +21,44 @@ $db_user = 'root';
 $db_pass = '';
 
 try {
-    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $db_user, $db_pass);
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $db_user, $db_pass);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $e) {
-    echo json_encode(["success" => false, "message" => "Erreur de connexion à la base de données"]);
-    exit;
+    http_response_code(500);
+    die(json_encode(["success" => false, "message" => "Database connection failed"]));
 }
 
 $data = json_decode(file_get_contents("php://input"), true);
 
 if (!isset($data['username']) || !isset($data['password'])) {
-    echo json_encode(["success" => false, "message" => "Données manquantes"]);
-    exit;
+    http_response_code(400);
+    die(json_encode(["success" => false, "message" => "Données manquantes"]));
 }
 
 $username = trim($data['username']);
 $password = $data['password'];
 
 if (empty($username) || empty($password)) {
-    echo json_encode(["success" => false, "message" => "Veuillez remplir tous les champs"]);
-    exit;
+    http_response_code(400);
+    die(json_encode(["success" => false, "message" => "Veuillez remplir tous les champs"]));
 }
 
-// Check if username already exists
-$stmt = $pdo->prepare("SELECT id FROM users WHERE username = :username");
-$stmt->execute(['username' => $username]);
-if ($stmt->fetch()) {
-    echo json_encode(["success" => false, "message" => "Ce nom d'utilisateur est déjà pris"]);
-    exit;
-}
+try {
+    // Check if username already exists
+    $stmt = $pdo->prepare("SELECT id FROM users WHERE username = :username");
+    $stmt->execute(['username' => $username]);
+    if ($stmt->fetch()) {
+        http_response_code(409);
+        die(json_encode(["success" => false, "message" => "Ce nom d'utilisateur est déjà pris"]));
+    }
 
-// Insert new user
-$stmt = $pdo->prepare("INSERT INTO users (username, password, role) VALUES (:username, :password, 'user')");
-if ($stmt->execute(['username' => $username, 'password' => $password])) {
-    echo json_encode(["success" => true, "message" => "Compte créé avec succès !"]);
-} else {
-    echo json_encode(["success" => false, "message" => "Erreur lors de la création du compte"]);
+    // Insert new user with empty email and tel
+    $stmt = $pdo->prepare("INSERT INTO users (username, password, role, email, tel) VALUES (:username, :password, 'user', '', '')");
+    $stmt->execute(['username' => $username, 'password' => $password]);
+    
+    http_response_code(201);
+    die(json_encode(["success" => true, "message" => "Compte créé avec succès !"]));
+} catch (Exception $e) {
+    http_response_code(500);
+    die(json_encode(["success" => false, "message" => "Erreur lors de la création du compte"]));
 }

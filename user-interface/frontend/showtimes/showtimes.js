@@ -3,18 +3,41 @@
 class ShowtimesPage {
   constructor() {
     this.selectedDate = null;
-    this.movies = moviesData.nowShowing;
+    this.showtimesData = {}; // mapped by date
+    this.movies = [];
     this.init();
   }
 
-  init() {
+  async init() {
+    await this.fetchShowtimes();
     this.setupDates();
     this.displayShowtimes();
   }
 
+  async fetchShowtimes() {
+      try {
+          const response = await fetch('../../backend/movies/get-showtimes.php');
+          const result = await response.json();
+          if (result.success) {
+              this.showtimesData = result.data;
+          }
+      } catch (error) {
+          console.error("Error fetching showtimes", error);
+      }
+  }
+
   setupDates() {
     const dateButtonsContainer = document.getElementById('dateButtons');
-    const availableDates = getAvailableDates();
+    if(!dateButtonsContainer) return;
+    
+    // Get unique dates from database or use generic ones if none.
+    let availableDates = Object.keys(this.showtimesData).sort();
+    
+    if (availableDates.length === 0) {
+        // Fallback or empty state
+        const tmr = new Date();
+        availableDates = [tmr.toISOString().split('T')[0]]; 
+    }
 
     availableDates.slice(0, 14).forEach((date, index) => {
       const dateObj = new Date(date);
@@ -49,7 +72,13 @@ class ShowtimesPage {
   displayShowtimes() {
     const container = document.getElementById('showTimesContainer');
     const noShowtimes = document.getElementById('noShowtimes');
+    
+    if(!container || !noShowtimes) return;
+    
     container.innerHTML = '';
+
+    const moviesMap = this.showtimesData[this.selectedDate];
+    this.movies = moviesMap ? Object.values(moviesMap) : [];
 
     if (this.movies.length === 0) {
       container.style.display = 'none';
@@ -89,21 +118,26 @@ class ShowtimesPage {
     const timesDiv = document.createElement('div');
     timesDiv.className = 'showtimes-grid';
 
-    movie.showtimes.forEach(time => {
+    movie.showtimes.forEach(seance => {
       const timeCard = document.createElement('div');
-      const availableSeats = Math.floor(Math.random() * 80) + 20;
-      const isBooked = availableSeats < 10;
+      const availableSeats = seance.availableSeats;
+      const isBooked = availableSeats < 10 && availableSeats > 0;
+      const isFull = availableSeats === 0;
 
-      timeCard.className = `showtime-card ${isBooked ? 'booked' : ''}`;
+      timeCard.className = `showtime-card ${isFull ? 'booked' : (isBooked ? 'almost-full' : '')}`;
+      let statusText = 'Available';
+      if (isFull) statusText = 'Sold Out';
+      else if (isBooked) statusText = 'Almost Full';
+
       timeCard.innerHTML = `
-        <div class="showtime-time">${time}</div>
+        <div class="showtime-time">${seance.time}</div>
         <div class="showtime-capacity">${availableSeats} seats</div>
-        <div class="showtime-available">${isBooked ? 'Almost Full' : 'Available'}</div>
+        <div class="showtime-available">${statusText}</div>
       `;
 
-      if (!isBooked) {
+      if (!isFull) {
         timeCard.addEventListener('click', () => {
-          this.selectShowtime(movie.id, time);
+          this.selectShowtime(movie.id, seance);
         });
       }
 
@@ -116,7 +150,7 @@ class ShowtimesPage {
     return movieDiv;
   }
 
-  selectShowtime(movieId, time) {
+  selectShowtime(movieId, seance) {
     // Find the movie
     const movie = this.movies.find(m => m.id === movieId);
 
@@ -124,7 +158,9 @@ class ShowtimesPage {
     localStorage.setItem('selectedMovie', JSON.stringify(movie));
     localStorage.setItem('selectedShowtime', JSON.stringify({
       date: this.selectedDate,
-      time: time
+      time: seance.time,
+      id: seance.id,
+      price: seance.price
     }));
 
     // Redirect to booking page
