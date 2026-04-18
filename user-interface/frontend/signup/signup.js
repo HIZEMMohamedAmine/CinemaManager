@@ -25,6 +25,8 @@ function showToast(msg, duration = 3000) {
 function handleSignup(e) {
   e.preventDefault();
   const username = document.getElementById('username').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const phone = document.getElementById('phone').value.trim();
   const password = document.getElementById('password').value;
   const confirmPassword = document.getElementById('confirm-password').value;
   const btn   = document.getElementById('submit-btn');
@@ -42,7 +44,7 @@ function handleSignup(e) {
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({ username, password })
+    body: JSON.stringify({ username, email, phone, password })
   })
   .then(response => {
     if (!response.ok) {

@@ -75,3 +75,96 @@ function handleSubmit(e) {
     showToast('✗ Erreur: ' + error.message, 3000);
   });
 }
+
+function setAuthMode(mode) {
+  const loginPanel = document.getElementById('login-panel');
+  const signupPanel = document.getElementById('signup-panel');
+  const footerLogin = document.getElementById('footer-login');
+  const footerSignup = document.getElementById('footer-signup');
+  const title = document.getElementById('card-title');
+  const sub = document.getElementById('card-sub');
+
+  if (mode === 'signup') {
+    loginPanel.hidden = true;
+    signupPanel.hidden = false;
+    footerLogin.hidden = true;
+    footerSignup.hidden = false;
+    if (title) title.textContent = 'Inscription';
+    if (sub) sub.textContent = 'Créez votre compte (e-mail et téléphone requis)';
+  } else {
+    loginPanel.hidden = false;
+    signupPanel.hidden = true;
+    footerLogin.hidden = false;
+    footerSignup.hidden = true;
+    if (title) title.textContent = 'Bienvenue';
+    if (sub) sub.textContent = 'Connectez-vous à votre espace';
+  }
+}
+
+function handleSignup(e) {
+  e.preventDefault();
+  const username = document.getElementById('signup-username').value.trim();
+  const email = document.getElementById('signup-email').value.trim();
+  const phone = document.getElementById('signup-phone').value.trim();
+  const password = document.getElementById('signup-password').value;
+  const confirmPassword = document.getElementById('signup-confirm-password').value;
+  const btn = document.getElementById('signup-submit-btn');
+
+  if (!email || !phone) {
+    showToast('✗ L’e-mail et le numéro de téléphone sont obligatoires', 3000);
+    return;
+  }
+
+  if (password !== confirmPassword) {
+    showToast('✗ Les mots de passe ne correspondent pas', 3000);
+    return;
+  }
+
+  btn.textContent = 'Création…';
+  btn.disabled = true;
+
+  fetch('../../backend/signup/api-signup.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username, email, phone, password })
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      return response.json();
+    })
+    .then((data) => {
+      btn.textContent = 'Créer mon compte';
+      btn.disabled = false;
+
+      if (data.success) {
+        showToast(`✓ ${data.message}`, 2000);
+        setTimeout(() => {
+          setAuthMode('login');
+          document.getElementById('signup-form').reset();
+        }, 1500);
+      } else {
+        showToast(`✗ ${data.message}`, 3000);
+      }
+    })
+    .catch((error) => {
+      btn.textContent = 'Créer mon compte';
+      btn.disabled = false;
+      console.error('Signup error:', error);
+      showToast('✗ Erreur: ' + error.message, 3000);
+    });
+}
+
+function wireAuthToggle() {
+  const showSignup = document.getElementById('btn-show-signup');
+  const showLogin = document.getElementById('btn-show-login');
+  if (showSignup) showSignup.addEventListener('click', () => setAuthMode('signup'));
+  if (showLogin) showLogin.addEventListener('click', () => setAuthMode('login'));
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', wireAuthToggle);
+} else {
+  wireAuthToggle();
+}

@@ -37,10 +37,17 @@ if (!isset($data['username']) || !isset($data['password'])) {
 
 $username = trim($data['username']);
 $password = $data['password'];
+$email = isset($data['email']) ? trim($data['email']) : '';
+$phone = isset($data['phone']) ? trim($data['phone']) : '';
 
-if (empty($username) || empty($password)) {
+if (empty($username) || empty($password) || $email === '' || $phone === '') {
     http_response_code(400);
-    die(json_encode(["success" => false, "message" => "Veuillez remplir tous les champs"]));
+    die(json_encode(["success" => false, "message" => "Veuillez remplir tous les champs (e-mail et téléphone inclus)"]));
+}
+
+if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    http_response_code(400);
+    die(json_encode(["success" => false, "message" => "Adresse e-mail invalide"]));
 }
 
 try {
@@ -52,9 +59,9 @@ try {
         die(json_encode(["success" => false, "message" => "Ce nom d'utilisateur est déjà pris"]));
     }
 
-    // Insert new user with empty email and tel
-    $stmt = $pdo->prepare("INSERT INTO users (username, password, role, email, tel) VALUES (:username, :password, 'user', '', '')");
-    $stmt->execute(['username' => $username, 'password' => $password]);
+    // Insert new user with email and tel
+    $stmt = $pdo->prepare("INSERT INTO users (username, password, role, email, tel) VALUES (:username, :password, 'user', :email, :tel)");
+    $stmt->execute(['username' => $username, 'password' => $password, 'email' => $email, 'tel' => $phone]);
     
     http_response_code(201);
     die(json_encode(["success" => true, "message" => "Compte créé avec succès !"]));
