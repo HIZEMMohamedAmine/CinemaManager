@@ -46,6 +46,8 @@ function handleSubmit(e) {
   .then(data => {
     resetBtn();
     if (data.success) {
+      // Store user session
+      localStorage.setItem('userSession', JSON.stringify({ username: data.username, role: data.role }));
       showToast('✓ Connecté avec succès', 2000);
       setTimeout(() => {
         if (data.role === 'admin') {
