@@ -7,6 +7,69 @@ require_once __DIR__ . '/../helpers.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
 
+function normalize_start_time(mysqli $conn, string $rawStartTime): string
+{
+    try {
+        $dt = new DateTime(trim($rawStartTime));
+        return mysqli_real_escape_string($conn, $dt->format('Y-m-d H:i:s'));
+    } catch (Exception $e) {
+        json_response(['error' => 'Format start_time invalide (YYYY-MM-DD HH:MM:SS attendu)'], 400);
+    }
+}
+
+function ensure_room_slot_available(mysqli $conn, int $roomId, int $filmId, string $startTime, int $excludeSeanceId = 0): void
+{
+    $film_query = mysqli_query($conn, "SELECT duration_minutes FROM films WHERE id = $filmId AND is_active = 1");
+    if (mysqli_num_rows($film_query) === 0) {
+        json_response(['error' => 'Film non trouvé'], 404);
+    }
+
+    $film_data = mysqli_fetch_array($film_query, MYSQLI_ASSOC);
+    $duration_minutes = (int)$film_data['duration_minutes'];
+    $total_duration = $duration_minutes + 15;
+
+    $start_dt = new DateTime($startTime);
+    $end_dt = clone $start_dt;
+    $end_dt->modify("+$total_duration minutes");
+
+    $start_str = $start_dt->format('Y-m-d H:i:s');
+    $end_str = $end_dt->format('Y-m-d H:i:s');
+
+    $exclude_clause = $excludeSeanceId > 0 ? "AND se.id != $excludeSeanceId" : '';
+
+    $conflict_sql = "SELECT
+                        se.id,
+                        f.title as film_title,
+                        se.start_time,
+                        DATE_ADD(se.start_time, INTERVAL f.duration_minutes + 15 MINUTE) as end_time
+                    FROM seances se
+                    JOIN films f ON se.film_id = f.id
+                    WHERE se.room_id = $roomId
+                    $exclude_clause
+                    AND se.start_time < '$end_str'
+                    AND DATE_ADD(se.start_time, INTERVAL f.duration_minutes + 15 MINUTE) > '$start_str'
+                    ORDER BY se.start_time ASC
+                    LIMIT 1";
+
+    $conflict_result = mysqli_query($conn, $conflict_sql);
+    if (!$conflict_result) {
+        json_response(['error' => 'Erreur vérification disponibilité: ' . mysqli_error($conn)], 500);
+    }
+
+    if (mysqli_num_rows($conflict_result) > 0) {
+        $conflict = mysqli_fetch_array($conflict_result, MYSQLI_ASSOC);
+        json_response([
+            'error' => 'Salle indisponible: chevauchement avec une autre séance (pause de 15 min incluse)',
+            'conflict' => [
+                'id' => (int)$conflict['id'],
+                'film_title' => htmlspecialchars($conflict['film_title']),
+                'start_time' => $conflict['start_time'],
+                'end_time' => $conflict['end_time']
+            ]
+        ], 409);
+    }
+}
+
 // Endpoint pour récupérer les données des selects (films et salles)
 if (isset($_GET['action']) && $_GET['action'] === 'select-data') {
     // Récupérer les films actifs
@@ -94,7 +157,7 @@ if ($method === 'POST') {
 
     $film_id = (int)$data['film_id'];
     $room_id = (int)$data['room_id'];
-    $start_time = mysqli_real_escape_string($conn, trim((string)$data['start_time']));
+    $start_time = normalize_start_time($conn, (string)$data['start_time']);
     $base_price = (float)$data['base_price'];
 
     // Validation
@@ -124,6 +187,8 @@ if ($method === 'POST') {
     
     $room_data = mysqli_fetch_array($room_check, MYSQLI_ASSOC);
     $total_seats = (int)$room_data['capacity'];
+
+    ensure_room_slot_available($conn, $room_id, $film_id, $start_time);
 
     $sql = "INSERT INTO seances (film_id, room_id, start_time, total_seats, available_seats, base_price, status)
             VALUES ($film_id, $room_id, '$start_time', $total_seats, $total_seats, $base_price, 'Disponible')";
@@ -149,7 +214,7 @@ if ($method === 'PUT') {
 
     $film_id = (int)$data['film_id'];
     $room_id = (int)$data['room_id'];
-    $start_time = mysqli_real_escape_string($conn, trim((string)$data['start_time']));
+    $start_time = normalize_start_time($conn, (string)$data['start_time']);
     $base_price = (float)$data['base_price'];
 
     // Validation
@@ -179,6 +244,8 @@ if ($method === 'PUT') {
     
     $room_data = mysqli_fetch_array($room_check, MYSQLI_ASSOC);
     $total_seats = (int)$room_data['capacity'];
+
+    ensure_room_slot_available($conn, $room_id, $film_id, $start_time, $id);
 
     $sql = "UPDATE seances 
             SET film_id = $film_id, 
