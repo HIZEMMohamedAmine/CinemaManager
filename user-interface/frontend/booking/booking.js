@@ -12,7 +12,7 @@ class BookingPage {
     this.init();
   }
 
-  init() {
+  async init() {
     const userSession = localStorage.getItem('userSession');
     if (!userSession) {
       alert("You must be logged in to book a ticket.");
@@ -20,23 +20,75 @@ class BookingPage {
       return;
     }
 
-    this.checkLoginState(userSession);
+    await this.checkLoginState(userSession);
     this.loadBookingData();
     this.setupEventListeners();
     this.updateSummary();
   }
 
-  checkLoginState(userSessionData) {
+  async checkLoginState(userSessionData) {
     try {
         const user = JSON.parse(userSessionData);
         if(user && user.username) {
-            // Pre-fill name and lock it if possible
+            // Pre-fill name from session
             const nameField = document.getElementById('fullName');
             if(nameField) {
                 nameField.value = user.username;
             }
+
+            // Fetch user profile from database
+            await this.loadUserProfile(user.username);
         }
-    } catch(e) {}
+    } catch(e) {
+        console.error('Error parsing user session:', e);
+    }
+  }
+
+  async loadUserProfile(username) {
+    try {
+      console.log('Loading user profile for:', username);
+      
+      const response = await fetch('../../backend/user/get-profile.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ username: username })
+      });
+
+      console.log('Profile API response status:', response.status);
+
+      if (!response.ok) {
+        console.error('Failed to fetch user profile:', response.status);
+        return;
+      }
+
+      const result = await response.json();
+      console.log('Profile API result:', result);
+
+      if (result.success && result.profile) {
+        const profile = result.profile;
+        console.log('User profile retrieved:', profile);
+
+        // Pre-fill email from database
+        const emailField = document.getElementById('email');
+        if (emailField && profile.email) {
+          emailField.value = profile.email;
+          console.log('Email field filled:', profile.email);
+        }
+
+        // Pre-fill phone from database
+        const phoneField = document.getElementById('phone');
+        if (phoneField && profile.tel) {
+          phoneField.value = profile.tel;
+          console.log('Phone field filled:', profile.tel);
+        }
+      } else {
+        console.warn('Could not retrieve user profile:', result.message);
+      }
+    } catch (e) {
+      console.error('Error loading user profile:', e);
+    }
   }
 
   loadBookingData() {
@@ -86,13 +138,13 @@ class BookingPage {
 
     // Update prices
     const seatPriceEl = document.getElementById('seatPrice');
-    if(seatPriceEl) seatPriceEl.textContent = `$${this.ticketPrice.toFixed(2)}`;
+    if(seatPriceEl) seatPriceEl.textContent = `${this.ticketPrice.toFixed(3)}TND`;
     
     const numSeatsEl = document.getElementById('numSeats');
     if(numSeatsEl) numSeatsEl.textContent = this.ticketCount;
     
     const totalEl = document.getElementById('totalPrice');
-    if(totalEl) totalEl.textContent = `$${total.toFixed(2)}`;
+    if(totalEl) totalEl.textContent = `${total.toFixed(3)}TND`;
   }
 
   setupEventListeners() {
