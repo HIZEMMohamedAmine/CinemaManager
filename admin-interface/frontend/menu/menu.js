@@ -18,7 +18,7 @@ function logout() {
     localStorage.removeItem('userSession');
     localStorage.removeItem('selectedMovie');
     localStorage.removeItem('selectedShowtime');
-    window.top.location.href = '/CinemaManager2/user-interface/frontend/index/index.html';
+    window.top.location.href = '/CinemaManager/user-interface/frontend/index/index.html';
 }
 
 window.logout = logout;

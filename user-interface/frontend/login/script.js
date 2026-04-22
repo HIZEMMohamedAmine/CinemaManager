@@ -49,7 +49,7 @@ function handleSubmit(e) {
     btn.disabled = false;
 
     if (data.success) {
-      showToast(`✓ Connecté avec succès`, 2000);
+      showToast(`[✓] Connecté avec succès`, 2000);
       
       // Store user session in localStorage
       localStorage.setItem('userSession', JSON.stringify({
@@ -65,14 +65,14 @@ function handleSubmit(e) {
         }
       }, 1000);
     } else {
-      showToast(`✗ ${data.message || 'Identifiants incorrects'}`, 3000);
+      showToast(`[✗] ${data.message || 'Identifiants incorrects'}`, 3000);
     }
   })
   .catch(error => {
     btn.textContent = 'Se connecter';
     btn.disabled = false;
     console.error('Login error:', error);
-    showToast('✗ Erreur: ' + error.message, 3000);
+    showToast('[✗] Erreur: ' + error.message, 3000);
   });
 }
 
@@ -111,12 +111,12 @@ function handleSignup(e) {
   const btn = document.getElementById('signup-submit-btn');
 
   if (!email || !phone) {
-    showToast('✗ L’e-mail et le numéro de téléphone sont obligatoires', 3000);
+    showToast("[✗] L'e-mail et le numéro de téléphone sont obligatoires", 3000);
     return;
   }
 
   if (password !== confirmPassword) {
-    showToast('✗ Les mots de passe ne correspondent pas', 3000);
+    showToast('[✗] Les mots de passe ne correspondent pas', 3000);
     return;
   }
 
