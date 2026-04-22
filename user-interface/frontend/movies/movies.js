@@ -16,6 +16,7 @@ class MoviesPage {
   async init() {
     await this.fetchMovies();
     this.loadMovies();
+    this.populateGenreFilter();
     this.setupEventListeners();
     this.handleSearch();
     this.renderMovies();
@@ -37,6 +38,41 @@ class MoviesPage {
   loadMovies() {
     this.allMovies = [...this.nowShowing, ...this.comingSoon];
     this.filteredMovies = this.allMovies;
+  }
+
+  getMovieGenres(movie) {
+    if (!movie || !movie.genre) return [];
+
+    return String(movie.genre)
+      .split(/[,/&|]+/)
+      .map((genre) => genre.trim())
+      .filter(Boolean);
+  }
+
+  populateGenreFilter() {
+    const genreFilter = document.getElementById('genreFilter');
+    if (!genreFilter) return;
+
+    const genreSet = new Set();
+    this.allMovies.forEach((movie) => {
+      this.getMovieGenres(movie).forEach((genre) => genreSet.add(genre));
+    });
+
+    const genres = Array.from(genreSet).sort((a, b) => a.localeCompare(b));
+
+    genreFilter.innerHTML = '';
+
+    const allOption = document.createElement('option');
+    allOption.value = '';
+    allOption.textContent = 'All Genres';
+    genreFilter.appendChild(allOption);
+
+    genres.forEach((genre) => {
+      const option = document.createElement('option');
+      option.value = genre;
+      option.textContent = genre;
+      genreFilter.appendChild(option);
+    });
   }
 
   setupEventListeners() {
@@ -66,8 +102,11 @@ class MoviesPage {
   applyFilters() {
     this.filteredMovies = this.allMovies.filter(movie => {
       // Genre filter
-      if (this.filters.genre && !movie.genre.includes(this.filters.genre)) {
-        return false;
+      if (this.filters.genre) {
+        const movieGenres = this.getMovieGenres(movie).map((genre) => genre.toLowerCase());
+        if (!movieGenres.includes(this.filters.genre.toLowerCase())) {
+          return false;
+        }
       }
 
       // Status filter
@@ -130,22 +169,10 @@ class MoviesPage {
     const card = document.createElement('div');
     card.className = 'movie-card fade-in';
 
-    const buttonHTML = isComingSoon
-      ? `<button class="btn btn-secondary btn-small" style="cursor: default;">Coming Soon</button>`
-      : `<button class="btn btn-primary btn-small" onclick="window.location.href='../movie-details/movie-details.html?id=${movie.id}'">Book Now</button>`;
-
     card.innerHTML = `
       <img src="${movie.poster}" alt="${movie.title}" class="movie-poster">
-      <div class="movie-info">
-        <h3 class="movie-title">${movie.title}</h3>
-        <div class="movie-meta">
-          <span class="movie-genre">${movie.genre}</span>
-          <span class="movie-duration">${movie.duration}</span>
-        </div>
-        <div class="movie-card-footer" style="margin-top: 15px;">
-          ${buttonHTML}
-        </div>
-      </div>
+      ${isComingSoon ? '<span class="movie-status-badge">Coming Soon</span>' : ''}
+      <div class="movie-info" aria-hidden="true"></div>
     `;
 
     card.addEventListener('click', () => {

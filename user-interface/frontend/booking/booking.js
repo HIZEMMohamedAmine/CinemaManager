@@ -12,11 +12,20 @@ class BookingPage {
     this.init();
   }
 
+  navigateToHome() {
+    const homeUrl = '../index/index.html';
+    if (window.self !== window.top) {
+      window.top.location.replace(homeUrl);
+      return;
+    }
+    window.location.href = homeUrl;
+  }
+
   async init() {
     const userSession = localStorage.getItem('userSession');
     if (!userSession) {
       alert("You must be logged in to book a ticket.");
-      window.location.href = '../login/login.html';
+      window.top.location.replace('../login/login.html');
       return;
     }
 
@@ -96,7 +105,7 @@ class BookingPage {
     const showtimeData = localStorage.getItem('selectedShowtime');
 
     if (!movieData || !showtimeData) {
-      window.location.href = '../index/index.html';
+      this.navigateToHome();
       return;
     }
 

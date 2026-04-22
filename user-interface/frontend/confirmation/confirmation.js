@@ -6,6 +6,15 @@ class ConfirmationPage {
     this.init();
   }
 
+  navigateToHome() {
+    const homeUrl = '../index/index.html';
+    if (window.self !== window.top) {
+      window.top.location.href = homeUrl;
+      return;
+    }
+    window.location.href = homeUrl;
+  }
+
   init() {
     this.loadBookingData();
     this.renderConfirmation();
@@ -16,7 +25,7 @@ class ConfirmationPage {
     const bookingData = localStorage.getItem('booking');
 
     if (!bookingData) {
-      window.location.href = '../index/index.html';
+      this.navigateToHome();
       return;
     }
 
@@ -101,7 +110,7 @@ class ConfirmationPage {
     // Home Button
     document.getElementById('homeBtn').addEventListener('click', () => {
       this.clearBookingData();
-      window.location.href = '../index/index.html';
+      this.navigateToHome();
     });
 
     // Share buttons

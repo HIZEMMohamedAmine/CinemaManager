@@ -8,7 +8,7 @@ $requestURI = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $method = $_SERVER['REQUEST_METHOD'];
 
 // Remove base path from URI
-$basePath = '/CinemaManager/admin-interface/backend/api';
+$basePath = '/CinemaManager2/admin-interface/backend/api';
 $route = str_replace($basePath, '', $requestURI);
 $route = trim($route, '/');
 

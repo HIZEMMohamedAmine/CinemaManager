@@ -61,12 +61,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             const poster = item.poster_url || fallbackPoster;
 
             html += `
-                <div class="history-card reveal-scale">
+                <div class="history-card">
                     <img src="${poster}" alt="${item.film_title}" class="history-poster">
                     <div class="history-details">
                         <div style="display: flex; justify-content: space-between; align-items:flex-start;">
                             <h3>${item.film_title}</h3>
                             <span class="status-badge ${item.status}">${item.status}</span>
+                        </div>
+                        <div style="margin: 6px 0 10px 0; font-size: 0.9rem; color: #d1d5db;">
+                            Ticket ID: <strong>${item.booking_code}</strong>
                         </div>
                         <div class="history-meta">
                             <span>📅 Showtime: ${dateStr} at ${timeStr}</span>
@@ -74,7 +77,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                             <span>💰 Total: $${item.total_amount}</span>
                         </div>
                         <div style="margin-top: 15px; font-size: 0.85rem; color: #6b7280; border-top: 1px solid #374151; padding-top: 10px;">
-                            <span>Booking Code: <strong>${item.booking_code}</strong> | Reserved on: ${reservedDate}</span>
+                            <span>Reserved on: ${reservedDate}</span>
                         </div>
                     </div>
                 </div>
@@ -82,10 +85,5 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
 
         historyList.innerHTML = html;
-        
-        // Re-initialize animations for dynamically injected cards
-        if (window.CineMaxAnimations && window.CineMaxAnimations.initScrollReveal) {
-            setTimeout(window.CineMaxAnimations.initScrollReveal, 50);
-        }
     }
 });

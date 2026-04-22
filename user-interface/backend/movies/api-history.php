@@ -13,6 +13,12 @@ if (empty($username)) {
 }
 
 try {
+    // Resolve account email so we can match bookings even when customer_name differs.
+    $userStmt = $pdo->prepare("SELECT email FROM users WHERE username = :username LIMIT 1");
+    $userStmt->execute(['username' => $username]);
+    $userRow = $userStmt->fetch(PDO::FETCH_ASSOC);
+    $userEmail = $userRow['email'] ?? '';
+
     // We join reservations, seances, and films to get a complete history
     $stmt = $pdo->prepare("
         SELECT 
@@ -23,10 +29,14 @@ try {
         JOIN seances s ON r.seance_id = s.id
         JOIN films f ON s.film_id = f.id
         WHERE r.customer_name = :username
+           OR (:email <> '' AND r.customer_email = :email)
         ORDER BY r.reserved_at DESC
     ");
     
-    $stmt->execute(['username' => $username]);
+    $stmt->execute([
+        'username' => $username,
+        'email' => $userEmail
+    ]);
     $history = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
     echo json_encode([

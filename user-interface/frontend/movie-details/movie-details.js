@@ -7,6 +7,15 @@ class MovieDetailsPage {
     this.init();
   }
 
+  navigateToHome() {
+    const homeUrl = '../index/index.html';
+    if (window.self !== window.top) {
+      window.top.location.href = homeUrl;
+      return;
+    }
+    window.location.href = homeUrl;
+  }
+
   async init() {
     await this.loadMovieData();
     if(this.movie) {
@@ -20,7 +29,7 @@ class MovieDetailsPage {
     const movieId = parseInt(urlParams.get('id'));
 
     if (!movieId) {
-        window.location.href = '../index/index.html';
+      this.navigateToHome();
         return;
     }
 
@@ -35,11 +44,11 @@ class MovieDetailsPage {
             this.displayShowtimes();
         } else {
             console.error("Movie not found");
-            window.location.href = '../index/index.html';
+          this.navigateToHome();
         }
     } catch (error) {
         console.error("Failed to load movie details", error);
-        window.location.href = '../index/index.html';
+        this.navigateToHome();
     }
   }
 

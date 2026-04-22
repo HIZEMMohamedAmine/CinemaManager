@@ -15,32 +15,46 @@ class ShowtimesPage {
   }
 
   async fetchShowtimes() {
-      try {
-          const response = await fetch('../../backend/movies/get-showtimes.php');
-          const result = await response.json();
-          if (result.success) {
-              this.showtimesData = result.data;
-          }
-      } catch (error) {
-          console.error("Error fetching showtimes", error);
+    try {
+      const response = await fetch('../../backend/movies/get-showtimes.php');
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
       }
+
+      const result = await response.json();
+      if (result.success) {
+        this.showtimesData = result.data;
+      } else {
+        this.showtimesData = {};
+        console.error('Showtimes API error:', result.message || 'Unknown error');
+      }
+    } catch (error) {
+      console.error("Error fetching showtimes", error);
+      this.showtimesData = {};
+    }
   }
 
   setupDates() {
     const dateButtonsContainer = document.getElementById('dateButtons');
     if(!dateButtonsContainer) return;
+
+    dateButtonsContainer.innerHTML = '';
     
-    // Get unique dates from database or use generic ones if none.
+    // Get unique dates from database or fallback to upcoming week.
     let availableDates = Object.keys(this.showtimesData).sort();
     
     if (availableDates.length === 0) {
-        // Fallback or empty state
-        const tmr = new Date();
-        availableDates = [tmr.toISOString().split('T')[0]]; 
+      const today = new Date();
+      availableDates = Array.from({ length: 7 }, (_, offset) => {
+        const d = new Date(today);
+        d.setDate(today.getDate() + offset);
+        return d.toISOString().split('T')[0];
+      });
     }
 
     availableDates.slice(0, 14).forEach((date, index) => {
-      const dateObj = new Date(date);
+      const dateObj = new Date(`${date}T00:00:00`);
       const button = document.createElement('button');
       button.className = `date-button ${index === 0 ? 'active' : ''}`;
       button.textContent = dateObj.toLocaleDateString('en-US', {
@@ -102,14 +116,20 @@ class ShowtimesPage {
     // Create movie header with poster
     const headerDiv = document.createElement('div');
     headerDiv.className = 'movie-header';
+    const safeTitle = this.escapeHtml(movie.title || 'Untitled');
+    const safeGenre = this.escapeHtml(movie.genre || 'Unknown');
+    const safeDuration = this.escapeHtml(movie.duration || 'N/A');
+    const safeRating = this.escapeHtml(movie.rating || '');
+    const safePoster = this.escapeHtml(movie.poster || 'https://via.placeholder.com/300x450/1a1a2e/ffffff?text=No+Poster');
+
     headerDiv.innerHTML = `
-      <img src="${movie.poster}" alt="${movie.title}" class="movie-poster-small">
+      <img src="${safePoster}" alt="${safeTitle}" class="movie-poster-small">
       <div class="movie-header-info">
-        <h3>${movie.title}</h3>
+        <h3>${safeTitle}</h3>
         <div class="movie-header-meta">
-          <span class="meta-badge">🎭 ${movie.genre}</span>
-          <span class="meta-badge">⏱️ ${movie.duration}</span>
-          ${movie.rating ? `<span class="meta-badge">⭐ ${movie.rating}/10</span>` : ''}
+          <span class="meta-badge">🎭 ${safeGenre}</span>
+          <span class="meta-badge">⏱️ ${safeDuration}</span>
+          ${safeRating ? `<span class="meta-badge">⭐ ${safeRating}/10</span>` : ''}
         </div>
       </div>
     `;
@@ -118,9 +138,11 @@ class ShowtimesPage {
     const timesDiv = document.createElement('div');
     timesDiv.className = 'showtimes-grid';
 
-    movie.showtimes.forEach(seance => {
+    const showtimes = Array.isArray(movie.showtimes) ? movie.showtimes : [];
+
+    showtimes.forEach(seance => {
       const timeCard = document.createElement('div');
-      const availableSeats = seance.availableSeats;
+      const availableSeats = Number(seance.availableSeats) || 0;
       const isBooked = availableSeats < 10 && availableSeats > 0;
       const isFull = availableSeats === 0;
 
@@ -160,11 +182,21 @@ class ShowtimesPage {
       date: this.selectedDate,
       time: seance.time,
       id: seance.id,
-      price: seance.price
+      price: seance.price,
+      room: seance.room || 'Standard Hall'
     }));
 
     // Redirect to booking page
     window.location.href = '../booking/booking.html';
+  }
+
+  escapeHtml(value) {
+    return String(value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
   }
 }
 

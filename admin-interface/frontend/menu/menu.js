@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
     const links = document.querySelectorAll('a');
+    const logoutBtn = document.getElementById('logoutBtn');
     
     links.forEach(link => {
         link.addEventListener('click', function() {
@@ -7,8 +8,17 @@ document.addEventListener('DOMContentLoaded', function() {
             this.classList.add('active');
         });
     });
+
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', logout);
+    }
 });
 
 function logout() {
-    window.top.location.href = '../../../user-interface/frontend/login/login.html';
+    localStorage.removeItem('userSession');
+    localStorage.removeItem('selectedMovie');
+    localStorage.removeItem('selectedShowtime');
+    window.top.location.href = '/CinemaManager2/user-interface/frontend/index/index.html';
 }
+
+window.logout = logout;

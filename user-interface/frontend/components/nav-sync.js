@@ -7,19 +7,26 @@
 class NavSync {
   constructor() {
     this.navLinks = document.querySelectorAll('.navbar-link[data-nav]');
+    this.isIframe = window.self !== window.top;
     this.init();
   }
 
   init() {
     // Run on page load
     this.syncNavigation();
+
+    // In iframe mode, the parent frame content changes while navbar stays mounted.
+    if (this.isIframe) {
+      window.addEventListener('focus', () => this.syncNavigation());
+      window.addEventListener('click', () => this.syncNavigation());
+    }
     
     // Optional: Re-sync on history change (for dynamic navigation)
     window.addEventListener('popstate', () => this.syncNavigation());
   }
 
   syncNavigation() {
-    const currentPath = window.location.pathname;
+    const currentPath = this.getCurrentPath();
     
     // Remove active class from all links
     this.navLinks.forEach(link => {
@@ -50,6 +57,29 @@ class NavSync {
     }
 
     console.log(`[NavSync] Current path: ${currentPath} | Active: ${activeNavKey}`);
+  }
+
+  getCurrentPath() {
+    if (!this.isIframe) {
+      return window.location.pathname;
+    }
+
+    try {
+      const parentDoc = window.parent.document;
+      const mainFrame = parentDoc.getElementById('mainFrame');
+      if (!mainFrame) {
+        return window.location.pathname;
+      }
+
+      const frameSrc = mainFrame.getAttribute('src');
+      if (frameSrc) {
+        return new URL(frameSrc, window.location.href).pathname;
+      }
+    } catch (e) {
+      // Parent document might be inaccessible in edge cases.
+    }
+
+    return window.location.pathname;
   }
 
   /**
