@@ -80,9 +80,9 @@ class ConfirmationPage {
     
     const ticketPrice = total / numSeats;
 
-    document.getElementById('ticketPrice').textContent = `$${ticketPrice.toFixed(2)}`;
+    document.getElementById('ticketPrice').textContent = `TND ${ticketPrice.toFixed(3)}`;
     document.getElementById('numSeats').textContent = numSeats;
-    document.getElementById('totalAmount').textContent = `$${total.toFixed(2)}`;
+    document.getElementById('totalAmount').textContent = `TND ${total.toFixed(3)}`;
 
     // Page title
     document.title = `Booking Confirmation - CineMax`;
@@ -102,10 +102,7 @@ class ConfirmationPage {
       });
     });
 
-    // Download Ticket
-    document.getElementById('downloadBtn').addEventListener('click', () => {
-      this.downloadTicket();
-    });
+
 
     // Home Button
     document.getElementById('homeBtn').addEventListener('click', () => {
@@ -121,62 +118,6 @@ class ConfirmationPage {
     });
   }
 
-  downloadTicket() {
-    const booking = this.booking;
-    let ticketContent = `
-CINEMAX - BOOKING TICKET
-========================
-
-Booking ID: ${booking.bookingId}
-
-MOVIE DETAILS
-Name: ${booking.movie.title}
-Genre: ${booking.movie.genre}
-Duration: ${booking.movie.duration}
-
-SHOW DETAILS
-Date: ${new Date(booking.showtime.date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
-Time: ${booking.showtime.time}
-Hall: Hall 1
-
-YOUR SEATS
-${booking.seats.join(', ')}
-
-CUSTOMER INFORMATION
-Name: ${booking.customer.fullName}
-Email: ${booking.customer.email}
-Phone: ${booking.customer.phone}
-
-PRICE SUMMARY
-Total: $${booking.totalPrice}
-
-IMPORTANT NOTES
-- Arrive 15 minutes before the show
-- Present your booking ID and valid ID at counter
-- Cancellation allowed up to 2 hours before show
-- A confirmation email has been sent
-
-Thank you for booking with CineMax!
-www.cinemax.tn
-    `;
-
-    // Create blob and download
-    const element = document.createElement('a');
-    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(ticketContent));
-    element.setAttribute('download', `CineMax_Ticket_${booking.bookingId}.txt`);
-    element.style.display = 'none';
-    document.body.appendChild(element);
-    element.click();
-    document.body.removeChild(element);
-
-    // Show feedback
-    const btn = document.getElementById('downloadBtn');
-    const originalText = btn.textContent;
-    btn.textContent = '✓ Downloaded!';
-    setTimeout(() => {
-      btn.textContent = originalText;
-    }, 2000);
-  }
 
   shareBooking(index) {
     const booking = this.booking;

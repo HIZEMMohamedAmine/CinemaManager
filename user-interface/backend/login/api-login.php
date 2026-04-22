@@ -39,18 +39,25 @@ $username = trim($data['username']);
 $password = $data['password'];
 
 try {
-    $stmt = $pdo->prepare("SELECT id, username, role FROM users WHERE username = :username AND password = :password");
-    $stmt->execute(['username' => $username, 'password' => $password]);
+    // Fetch user by username only, then verify password in PHP
+    $stmt = $pdo->prepare("SELECT id, username, password, role FROM users WHERE username = :username");
+    $stmt->execute(['username' => $username]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($user) {
-        // Successfully found
-        http_response_code(200);
-        die(json_encode(["success" => true, "username" => $user['username'], "role" => $user['role']]));
-    } else {
-        http_response_code(401);
-        die(json_encode(["success" => false, "message" => "Identifiants incorrects"]));
+        // Support both hashed passwords (password_hash) and plain-text (legacy)
+        $passwordValid = password_verify($password, $user['password']) || $user['password'] === $password;
+
+        if ($passwordValid) {
+            http_response_code(200);
+            die(json_encode(["success" => true, "username" => $user['username'], "role" => $user['role']]));
+        }
     }
+
+    // User not found or wrong password
+    http_response_code(401);
+    die(json_encode(["success" => false, "message" => "Identifiants incorrects"]));
+
 } catch (Exception $e) {
     http_response_code(500);
     die(json_encode(["success" => false, "message" => "Database error"]));

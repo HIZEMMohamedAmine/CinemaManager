@@ -93,7 +93,7 @@ if ($method === 'POST') {
         $target_file = $target_dir . $new_file_name;
         
         if (move_uploaded_file($file_tmp, $target_file)) {
-            $poster_url = '/CinemaManager2/images/' . $new_file_name;
+            $poster_url = '/CinemaManager/images/' . $new_file_name;
             $poster_url = mysqli_real_escape_string($conn, $poster_url);
         }
     }

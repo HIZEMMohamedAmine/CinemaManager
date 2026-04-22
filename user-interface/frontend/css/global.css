@@ -854,7 +854,7 @@ textarea.form-control {
  * Navbar is fixed, so content needs margin-top
  */
 .navbar-offset {
-  margin-top: 70px; /* Accounts for fixed navbar height */
+  margin-top: 0; /* Fixed navbar overlays on top */
 }
 
 /**

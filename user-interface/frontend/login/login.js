@@ -48,7 +48,7 @@ function handleSubmit(e) {
     if (data.success) {
       // Store user session
       localStorage.setItem('userSession', JSON.stringify({ username: data.username, role: data.role }));
-      showToast('✓ Connecté avec succès', 2000);
+      showToast('[✓] Connecté avec succès', 2000);
       setTimeout(() => {
         if (data.role === 'admin') {
           window.location.href = '../../../admin-interface/frontend/main/main.html';
@@ -57,13 +57,13 @@ function handleSubmit(e) {
         }
       }, 1000);
     } else {
-      showToast(`✗ ${data.message || 'Identifiants incorrects'}`, 3000);
+      showToast(`[✗] ${data.message || 'Identifiants incorrects'}`, 3000);
     }
   })
   .catch(() => {
     // Demo mode: if no backend, just redirect to home
     resetBtn();
-    showToast('✓ Mode démo — Connexion simulée', 2000);
+    showToast('[✓] Mode démo — Connexion simulée', 2000);
     setTimeout(() => {
       window.location.href = '../index/index.html';
     }, 1200);

@@ -32,7 +32,7 @@ function handleSignup(e) {
   const btn   = document.getElementById('submit-btn');
 
   if (password !== confirmPassword) {
-    showToast('✗ Les mots de passe ne correspondent pas', 3000);
+    showToast('[✗] Les mots de passe ne correspondent pas', 3000);
     return;
   }
 
@@ -57,20 +57,20 @@ function handleSignup(e) {
     btn.disabled = false;
 
     if (data.success) {
-      showToast(`✓ ${data.message}`, 2000);
+      showToast(`[✓] ${data.message}`, 2000);
       
       setTimeout(() => {
         window.location.href = '../login/login.html';
       }, 1500);
     } else {
-      showToast(`✗ ${data.message}`, 3000);
+      showToast(`[✗] ${data.message}`, 3000);
     }
   })
   .catch(error => {
     btn.textContent = 'Créer mon compte';
     btn.disabled = false;
     console.error('Signup error:', error);
-    showToast('✗ Erreur: ' + error.message, 3000);
+    showToast('[✗] Erreur: ' + error.message, 3000);
     console.error(error);
   });
 }
