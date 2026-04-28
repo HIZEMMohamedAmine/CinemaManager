@@ -17,15 +17,29 @@ let allSeances = [];
 let reservationsData = [];
 
 function statusLabel(value) {
-    if (value === 'Attente') return 'Attente';
-    if (value === 'Annulee' || value === 'Annulee') return 'Annulee';
-    return 'Confirmee';
+    const status = normalizeStatus(value);
+    if (status === 'Attente') return 'Attente';
+    if (status === 'Annulee') return 'Annulée';
+    return 'Confirmée';
 }
 
 function statusForSelect(value) {
-    if (value === 'Attente') return 'Attente';
-    if (value === 'Annulee' || value === 'Annule') return 'Annulée';
-    return 'Confirmée';
+    return normalizeStatus(value);
+}
+
+function normalizeStatus(value) {
+    const status = (value || '').toString().trim().toLowerCase();
+    const normalized = status
+        .replace(/[àáâä]/g, 'a')
+        .replace(/[ç]/g, 'c')
+        .replace(/[èéêë]/g, 'e')
+        .replace(/[ìíîï]/g, 'i')
+        .replace(/[òóôö]/g, 'o')
+        .replace(/[ùúûü]/g, 'u');
+
+    if (normalized === 'attente') return 'Attente';
+    if (normalized === 'annule' || normalized === 'annulee') return 'Annulee';
+    return 'Confirmee';
 }
 
 function renderReservations(items) {
@@ -322,7 +336,7 @@ if (form) {
             film_id: Number(document.getElementById('film-input').value),
             seance_id: Number(document.getElementById('heure-input').value),
             tickets_count: Number(document.getElementById('tickets-input').value),
-            status: document.getElementById('statut-select').value
+            status: normalizeStatus(document.getElementById('statut-select').value)
         };
 
         if (!payload.film_id || !payload.seance_id || payload.tickets_count <= 0) {

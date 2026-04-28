@@ -53,6 +53,30 @@ function required_fields(array $data, array $fields): void
 function normalize_reservation_status(?string $value): string
 {
     $value = strtolower(trim((string) $value));
+    $value = strtr($value, [
+        'à' => 'a',
+        'á' => 'a',
+        'â' => 'a',
+        'ä' => 'a',
+        'ç' => 'c',
+        'è' => 'e',
+        'é' => 'e',
+        'ê' => 'e',
+        'ë' => 'e',
+        'ì' => 'i',
+        'í' => 'i',
+        'î' => 'i',
+        'ï' => 'i',
+        'ò' => 'o',
+        'ó' => 'o',
+        'ô' => 'o',
+        'ö' => 'o',
+        'ù' => 'u',
+        'ú' => 'u',
+        'û' => 'u',
+        'ü' => 'u',
+    ]);
+
     if ($value === 'attente') {
         return 'Attente';
     }

@@ -78,21 +78,24 @@ function renderLatestReservations(reservations) {
 
 async function loadDashboard() {
     try {
-        const [filmsRes, seancesRes, reservationsRes] = await Promise.all([
+        const [filmsRes, seancesRes, reservationsRes, sallesRes] = await Promise.all([
             fetch('../../backend/api/film/get-films.php'),
             fetch('../../backend/api/seance/seances.php'),
-            fetch('../../backend/api/reservation/reservations.php')
+            fetch('../../backend/api/reservation/reservations.php'),
+            fetch('../../backend/api/salle/salles.php')
         ]);
 
-        const [filmsPayload, seancesPayload, reservationsPayload] = await Promise.all([
+        const [filmsPayload, seancesPayload, reservationsPayload, sallesPayload] = await Promise.all([
             filmsRes.json(),
             seancesRes.json(),
-            reservationsRes.json()
+            reservationsRes.json(),
+            sallesRes.json()
         ]);
 
         const films = Array.isArray(filmsPayload.data) ? filmsPayload.data : [];
         const seances = Array.isArray(seancesPayload.seances) ? seancesPayload.seances : [];
         const reservations = Array.isArray(reservationsPayload.reservations) ? reservationsPayload.reservations : [];
+        const salles = Array.isArray(sallesPayload.salles) ? sallesPayload.salles : [];
 
         const now = new Date();
         const weekStart = startOfWeek(now);
@@ -108,9 +111,19 @@ async function loadDashboard() {
             return date && date >= weekStart && status === 'confirmee';
         }).length;
 
-        const remainingSeats = seances.reduce((sum, seance) => {
-            return sum + Number(seance.available_seats || 0);
+        const totalSalleSeats = salles.reduce((sum, salle) => {
+            return sum + Number(salle.capacite || 0);
         }, 0);
+
+        const ticketsBought = reservations.reduce((sum, reservation) => {
+            const status = normalizeStatus(reservation.status);
+            if (status !== 'confirmee') {
+                return sum;
+            }
+            return sum + Number(reservation.tickets_count || 0);
+        }, 0);
+
+        const remainingSeats = Math.max(0, totalSalleSeats - ticketsBought);
 
         setNumber(filmsCountEl, films.length);
         setNumber(seancesTodayEl, seancesToday);

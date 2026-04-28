@@ -154,6 +154,12 @@
   background: var(--primary-dark);
 }
 
+/* Fallback: show reveal sections even if the animation script is missing */
+.movie-details .reveal {
+  opacity: 1;
+  transform: none;
+}
+
 .synopsis-section h2,
 .cast-section h2,
 .trailer-section h2,

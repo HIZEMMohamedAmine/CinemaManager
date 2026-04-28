@@ -1,5 +1,27 @@
 document.addEventListener('DOMContentLoaded', async () => {
     const historyList = document.getElementById('historyList');
+
+    function normalizeStatus(value) {
+        const status = (value || '').toString().trim().toLowerCase();
+        const normalized = status
+            .replace(/[àáâä]/g, 'a')
+            .replace(/[ç]/g, 'c')
+            .replace(/[èéêë]/g, 'e')
+            .replace(/[ìíîï]/g, 'i')
+            .replace(/[òóôö]/g, 'o')
+            .replace(/[ùúûü]/g, 'u');
+
+        if (normalized === 'attente') return 'Attente';
+        if (normalized === 'annule' || normalized === 'annulee') return 'Annulee';
+        return 'Confirmee';
+    }
+
+    function statusLabel(value) {
+        const status = normalizeStatus(value);
+        if (status === 'Attente') return 'Attente';
+        if (status === 'Annulee') return 'Annulée';
+        return 'Confirmée';
+    }
     
     // Check Authentication
     const userSessionData = localStorage.getItem('userSession');
@@ -56,6 +78,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const timeStr = dateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute:'2-digit' });
 
             const reservedDate = new Date(item.reserved_at).toLocaleDateString('en-US');
+            const statusKey = normalizeStatus(item.status);
 
             const fallbackPoster = 'https://via.placeholder.com/100x150?text=No+Poster';
             const poster = item.poster_url || fallbackPoster;
@@ -66,7 +89,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <div class="history-details">
                         <div style="display: flex; justify-content: space-between; align-items:flex-start;">
                             <h3>${item.film_title}</h3>
-                            <span class="status-badge ${item.status}">${item.status}</span>
+                            <span class="status-badge ${statusKey}">${statusLabel(item.status)}</span>
                         </div>
                         <div style="margin: 6px 0 10px 0; font-size: 0.9rem; color: #d1d5db;">
                             Ticket ID: <strong>${item.booking_code}</strong>
@@ -74,7 +97,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         <div class="history-meta">
                             <span>📅 Showtime: ${dateStr} at ${timeStr}</span>
                             <span>🎟️ Tickets: ${item.tickets_count}</span>
-                            <span>💰 Total: $${item.total_amount}</span>
+                            <span>💰 Total: TND${item.total_amount}</span>
                         </div>
                         <div style="margin-top: 15px; font-size: 0.85rem; color: #6b7280; border-top: 1px solid #374151; padding-top: 10px;">
                             <span>Reserved on: ${reservedDate}</span>
