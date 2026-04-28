@@ -1,5 +1,0 @@
-# Cinema Manager
-
-
-
-
